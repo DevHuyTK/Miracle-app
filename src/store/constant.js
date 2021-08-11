@@ -1,4 +1,4 @@
-export const DOMAIN = 'http://192.168.1.67:8000';
+export const DOMAIN = 'http://192.168.90.106:8000';
 
 export const GET_ACCOUNT_REQUEST = 'GET_ACCOUNT_REQUEST';
 export const GET_ACCOUNT_SUCCESS = 'GET_ACCOUNT_SUCCESS';

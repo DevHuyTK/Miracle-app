@@ -29,7 +29,7 @@ function Home() {
         name="Community"
         component={Community}
         options={{
-          tabBarLabel: 'Community',
+          tabBarLabel: 'Trang cộng đồng',
           tabBarIcon: ({ color, size }) => <FontAwesome name="group" color={color} size={size} />,
         }}
       />
@@ -37,7 +37,7 @@ function Home() {
         name="Personal"
         component={Personal}
         options={{
-          tabBarLabel: 'Personal',
+          tabBarLabel: 'Trang cá nhân',
           tabBarIcon: ({ color, size }) => (
             <FontAwesome name="user-circle" color={color} size={size} />
           ),
@@ -47,7 +47,7 @@ function Home() {
         name="Chat"
         component={Chat}
         options={{
-          tabBarLabel: 'Message',
+          tabBarLabel: 'Tin nhắn',
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="message" color={color} size={size} />
           ),
@@ -57,7 +57,7 @@ function Home() {
         name="Account"
         component={Account}
         options={{
-          tabBarLabel: 'Account',
+          tabBarLabel: 'Tài khoản',
           tabBarIcon: ({ color, size }) => <MaterialIcons name="menu" color={color} size={size} />,
         }}
       />
