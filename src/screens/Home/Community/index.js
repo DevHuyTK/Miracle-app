@@ -40,7 +40,7 @@ function Community({ navigation }) {
       ],
       caption: 'test post',
       likesCount: 11,
-      postAgo: '6 minute ago',
+      postAgo: '6 phút trước',
     },
     {
       id: '456',
@@ -50,7 +50,7 @@ function Community({ navigation }) {
       caption:
         'test post test post test post test post test post test post test post test post test post',
       likesCount: 11,
-      postAgo: '12 minute ago',
+      postAgo: '12 phút trước',
     },
     {
       id: '789',
@@ -59,7 +59,7 @@ function Community({ navigation }) {
       images: 'https://i.imgur.com/UPrs1EWl.jpg',
       caption: 'test post',
       likesCount: 11,
-      postAgo: '30 minute ago',
+      postAgo: '30 phút trước',
     },
   ];
 
@@ -74,7 +74,7 @@ function Community({ navigation }) {
             paddingLeft: 15,
             alignItems: 'center',
             borderBottomColor: 'gray',
-            borderBottomWidth: 1,
+            borderBottomWidth: 0.5,
           }}
         >
           {loginData.avatar ? (
@@ -97,7 +97,7 @@ function Community({ navigation }) {
             onPress={() => navigation.navigate('CreatePost')}
             style={{ width: '80%', marginLeft: 10, borderRadius: 10, paddingLeft: 6 }}
           >
-            <Text style={{ color: 'gray', fontSize: 20 }}>What's on your mind?</Text>
+            <Text style={{ color: 'gray', fontSize: 20 }}>Bạn đang nghĩ gì vậy?</Text>
           </TouchableOpacity>
         </View>
         <TouchableOpacity
@@ -111,7 +111,7 @@ function Community({ navigation }) {
           }}
         >
           <FontAwesome name="image" color="green" size={25} />
-          <Text style={{ color: 'black', marginLeft: 10, fontSize: 20 }}>Photo</Text>
+          <Text style={{ color: 'black', marginLeft: 10, fontSize: 20 }}>Ảnh</Text>
         </TouchableOpacity>
       </View>
     );
@@ -135,7 +135,7 @@ function Community({ navigation }) {
     <View style={{ flex: 1 }}>
       <Header onNavigation={navigation} />
       {/* {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />} */}
-      <SafeAreaView style={{ marginBottom: 140 }}>
+      <SafeAreaView style={{ flex: 2 }}>
         <FlatList
           data={data}
           keyExtractor={(item) => item.id}

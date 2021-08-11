@@ -58,11 +58,11 @@ function CreatePost(props) {
               size={30}
               onPress={() => props.navigation.goBack()}
             />
-            <Text style={styles.leftText}>Create Post</Text>
+            <Text style={styles.leftText}>Tạo bài viết</Text>
           </View>
           <View style={styles.right}>
             <TouchableOpacity style={styles.topPostButton}>
-              <Text style={styles.topPostText}>Post</Text>
+              <Text style={styles.topPostText}>Đăng</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -90,17 +90,17 @@ function CreatePost(props) {
         <TextInput
           multiline={true}
           scrollEnabled={true}
-          placeholder="What's on your mind?"
+          placeholder="Bạn đang nghĩ gì vậy?"
           style={styles.input}
         />
         <ImagesGrid data={images} />
         <TouchableOpacity style={styles.photoButton}>
           <FontAwesome name="image" color="green" size={30} />
-          <Text style={{ marginLeft: 10, fontSize: 18 }}>Photo</Text>
+          <Text style={{ marginLeft: 10, fontSize: 18 }}>Ảnh</Text>
         </TouchableOpacity>
         <View style={styles.bottomPostContainer}>
           <TouchableOpacity style={styles.bottomPostButton}>
-            <Text style={{ color: '#fff', fontSize: 18 }}>Post</Text>
+            <Text style={{ color: '#fff', fontSize: 18 }}>Đăng</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     height: 60,
     flexDirection: 'row',
     alignItems: 'center',
-    borderBottomWidth: 1,
+    borderBottomWidth: 0.5,
     borderBottomColor: 'gray',
   },
   left: {
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     height: 50,
     alignItems: 'center',
     paddingLeft: 16,
-    borderTopWidth: 1,
+    borderTopWidth: 0.5,
     borderTopColor: 'gray',
   },
   userName: {
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     height: 60,
     justifyContent: 'center',
     alignItems: 'center',
-    borderTopWidth: 1,
+    borderTopWidth: 0.5,
     borderTopColor: 'gray',
   },
   bottomPostButton: {
