@@ -18,50 +18,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Avatar } from 'react-native-elements';
 import { FontAwesome } from '@expo/vector-icons';
 import { ChangeDataContext } from '../../../contexts/ChangeData';
+import { connect } from 'react-redux';
 
 import { DOMAIN } from '../../../store/constant';
 
-function Community({ navigation }) {
+function Community(props) {
   const [image, setImage] = useState(null);
   const [loginData, setLoginData] = useState({});
   const { isChanged, setIsChanged } = useContext(ChangeDataContext);
-
-  const data = [
-    {
-      id: '123',
-      userName: 'thang',
-      avatar: '',
-      images: [
-        'https://i.imgur.com/UYiroysl.jpg',
-        'https://i.imgur.com/UPrs1EWl.jpg',
-        'https://i.imgur.com/MABUbpDl.jpg',
-        'https://i.imgur.com/KZsmUi2l.jpg',
-        'https://i.imgur.com/2nCt3Sbl.jpg',
-      ],
-      caption: 'test post',
-      likesCount: 11,
-      postAgo: '6 minute ago',
-    },
-    {
-      id: '456',
-      userName: 'doanh',
-      avatar: '',
-      images: '',
-      caption:
-        'test post test post test post test post test post test post test post test post test post',
-      likesCount: 11,
-      postAgo: '12 minute ago',
-    },
-    {
-      id: '789',
-      userName: 'huy',
-      avatar: '',
-      images: 'https://i.imgur.com/UPrs1EWl.jpg',
-      caption: 'test post',
-      likesCount: 11,
-      postAgo: '30 minute ago',
-    },
-  ];
 
   renderHeader = () => {
     return (
@@ -74,7 +38,7 @@ function Community({ navigation }) {
             paddingLeft: 15,
             alignItems: 'center',
             borderBottomColor: 'gray',
-            borderBottomWidth: 1,
+            borderBottomWidth: 0.5,
           }}
         >
           {loginData.avatar ? (
@@ -94,10 +58,10 @@ function Community({ navigation }) {
             />
           )}
           <TouchableOpacity
-            onPress={() => navigation.navigate('CreatePost')}
+            onPress={() => props.navigation.navigate('CreatePost')}
             style={{ width: '80%', marginLeft: 10, borderRadius: 10, paddingLeft: 6 }}
           >
-            <Text style={{ color: 'gray', fontSize: 20 }}>What's on your mind?</Text>
+            <Text style={{ color: 'gray', fontSize: 20 }}>Bạn đang nghĩ gì vậy?</Text>
           </TouchableOpacity>
         </View>
         <TouchableOpacity
@@ -111,7 +75,7 @@ function Community({ navigation }) {
           }}
         >
           <FontAwesome name="image" color="green" size={25} />
-          <Text style={{ color: 'black', marginLeft: 10, fontSize: 20 }}>Photo</Text>
+          <Text style={{ color: 'black', marginLeft: 10, fontSize: 20 }}>Ảnh</Text>
         </TouchableOpacity>
       </View>
     );
@@ -129,17 +93,17 @@ function Community({ navigation }) {
     fetchData()
       .then((data) => setLoginData(data))
       .catch((error) => console.log(error));
-  }, [isChanged]);
+  }, [!isChanged]);
 
   return (
     <View style={{ flex: 1 }}>
-      <Header onNavigation={navigation} />
+      <Header onNavigation={props.navigation} />
       {/* {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />} */}
-      <SafeAreaView style={{ marginBottom: 140 }}>
+      <SafeAreaView style={{ flex: 2 }}>
         <FlatList
-          data={data}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <Post post={item} />}
+          data={Object.values(props.newfeed)}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => <Post onNavigation={props.navigation} post={item} />}
           showsVerticalScrollIndicator={false}
           ListHeaderComponent={renderHeader()}
         />
@@ -147,6 +111,10 @@ function Community({ navigation }) {
     </View>
   );
 }
+
+const mapStateToProps = (state) => ({
+  newfeed: state.account.newfeed,
+});
 
 const styles = StyleSheet.create({
   mainBody: {
@@ -231,4 +199,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Community;
+export default connect(mapStateToProps)(Community);

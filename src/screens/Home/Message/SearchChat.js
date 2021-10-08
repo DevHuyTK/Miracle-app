@@ -1,24 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import {
-  SafeAreaView,
-  StyleSheet,
-  FlatList,
-  Alert,
-  Dimensions,
-  InputText,
   Text,
+  TextInput,
   View,
-  ActivityIndicator,
+  Dimensions,
+  TouchableWithoutFeedback,
+  Keyboard,
+  ScrollView,
+  StyleSheet,
   TouchableOpacity,
+  FlatList,
 } from 'react-native';
 import { Avatar, ListItem, SearchBar, Icon } from 'react-native-elements';
 import { DOMAIN } from '../../../store/constant';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import socketIOClient from 'socket.io-client';
 
 const { width } = Dimensions.get('window');
 
-function SearchChat({ navigation }) {
+function SearchChat(props) {
   let loading = false;
-
+  const socket = socketIOClient(DOMAIN);
   const [datas, setDatas] = useState([]);
   const [status, setStatus] = useState([]);
   const [searchData, setSearchData] = useState([]);
@@ -35,12 +37,34 @@ function SearchChat({ navigation }) {
       .then((res) => {
         if (res.status === 1) {
           setDatas(res.data);
-          console.log(datas);
         } else {
           setStatus([res.message, false]);
         }
       });
   }, []);
+
+  const handleOnPress = async (item) => {
+    const token = await AsyncStorage.getItem('token');
+    fetch(`${DOMAIN}/chat?userId=${item._id}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => response.json())
+      .then(async (res) => {
+        socket.emit('join', {
+          token: token,
+          userIds: [item._id],
+        });
+        navigation.navigate('ChatBox', {
+          data: item,
+          token,
+          chat: res.data,
+          user,
+        });
+      });
+  };
 
   searchFunction = (text) => {
     let e = text.trim().toLowerCase();
@@ -56,50 +80,6 @@ function SearchChat({ navigation }) {
       setText(text);
     }
   };
-
-  renderHeader = () => {
-    return (
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <View style={styles.left}>
-            <Icon
-              name="keyboard-backspace"
-              style="material"
-              size={30}
-              onPress={() => navigation.goBack()}
-            />
-            <Text style={styles.leftText}>New Message</Text>
-          </View>
-          <View style={styles.right}>
-            <TouchableOpacity style={styles.topPostButton}>
-              <Text style={styles.topPostText}>Chat</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View style={{ width: '85%', justifyContent: 'center', alignItems: 'center' }}>
-          <Text>To</Text>
-          <InputText
-            placeholder="Search"
-            style={{ borderRadius: 16 }}
-            containerStyle={{
-              width: '100%',
-              backgroundColor: '#fff',
-              borderRadius: 16,
-              borderBottomColor: '#fff',
-              borderTopColor: '#fff',
-            }}
-            lightTheme
-            round
-            // onChangeText={(text) => searchFunction(text)}
-            autoCorrect={false}
-            value={text}
-          />
-          <Text>Suggested</Text>
-        </View>
-      </View>
-    );
-  };
-
   if (loading) {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -107,6 +87,43 @@ function SearchChat({ navigation }) {
       </View>
     );
   }
+
+  renderHeader = () => {
+    return (
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <ScrollView style={styles.container}>
+          <View style={styles.header}>
+            <View style={styles.left}>
+              <Icon
+                name="keyboard-backspace"
+                style="material"
+                size={30}
+                onPress={() => props.navigation.goBack()}
+              />
+              <Text style={styles.leftText}>Tạo cuộc trò chuyện</Text>
+            </View>
+          </View>
+          <View>
+            <SearchBar
+              placeholder="Tìm kiếm ..."
+              containerStyle={{
+                width: '100%',
+                backgroundColor: '#fff',
+                borderRadius: 16,
+                borderBottomColor: '#fff',
+                borderTopColor: '#fff',
+              }}
+              lightTheme
+              onChangeText={(text) => searchFunction(text)}
+              autoCorrect={false}
+              value={text}
+            />
+          </View>
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    );
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <FlatList
@@ -114,7 +131,7 @@ function SearchChat({ navigation }) {
         data={searchData}
         renderItem={({ item, key }) => (
           <View>
-            <ListItem key={key} onPress={() => Alert.alert('press')}>
+            <ListItem key={key} onPress={() => handleOnPress(item)}>
               {item.avatar ? (
                 <Avatar
                   size="medium"
@@ -133,7 +150,7 @@ function SearchChat({ navigation }) {
               )}
               {/* <Avatar rounded source={DOMAIN/item.avatar} /> */}
               <ListItem.Content>
-                <ListItem.Title style={{ fontWeight: 'bold' }}>{item.full_name}</ListItem.Title>
+                <ListItem.Title style={{ fontWeight: 'bold' }}>{item.full_name ? item.full_name : item.username}</ListItem.Title>
                 <ListItem.Subtitle>{item.username}</ListItem.Subtitle>
               </ListItem.Content>
               <ListItem.Chevron color="white" />
@@ -160,23 +177,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  btnBack: {
-    padding: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 30,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
   header: {
     width: width,
     height: 60,
     flexDirection: 'row',
     alignItems: 'center',
-    borderBottomWidth: 1,
+    borderBottomWidth: 0.5,
     borderBottomColor: 'gray',
   },
   left: {

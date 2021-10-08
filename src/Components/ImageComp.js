@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { View, ScrollView, Image, Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
 import { Entypo, FontAwesome } from '@expo/vector-icons';
+import {DOMAIN} from '../store/constant'
 
 const { width } = Dimensions.get('window');
 const height = width;
@@ -39,7 +40,7 @@ function ImageComp({ images }) {
           ref={scrollViewRef}
         >
           {images.map((image, index) => (
-            <Image key={index} source={{ uri: image }} style={styles.image} />
+            <Image key={index} source={{ uri: `${DOMAIN}/${image}`}} style={styles.image} />
           ))}
         </ScrollView>
         <View style={styles.pagination}>

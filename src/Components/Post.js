@@ -1,13 +1,18 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import { Avatar, Icon } from 'react-native-elements';
 import ImageComp from './ImageComp';
+import { DOMAIN } from '../store/constant';
+import { ChangeDataContext } from '../contexts/ChangeData';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
 
-export default function Post({ post }) {
+export default function Post({ post, onNavigation }) {
+  const [user, setUser] = useState({});
   const [isLiked, setIsLike] = useState(false);
   const [likesCount, setLikesCount] = useState(post.likesCount);
+  const { isChanged, setIsChanged } = useContext(ChangeDataContext);
 
   const onLikePressed = () => {
     const amount = isLiked ? -1 : 1;
@@ -16,26 +21,82 @@ export default function Post({ post }) {
     setIsLike(!isLiked);
   };
 
+  const handleOnPress = async (item) => {
+    const token = await AsyncStorage.getItem('token');
+    const postAPI = `${DOMAIN}/api/photo/photo-targetuser?userId=${item.user_id}`;
+    const targetUserAPI = `${DOMAIN}/api/user/get-user?userId=${item.user_id}`;
+
+    Promise.all(
+      [
+        fetch(postAPI, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }).then((res) => res.json()),
+        fetch(targetUserAPI, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }).then((res) => res.json()),
+      ]
+    ).then(([posts, targetUser]) => {
+      onNavigation.navigate('YourScreen', {
+        data: targetUser,
+        token,
+        posts: posts,
+        user,
+      });
+    });
+
+    
+  };
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const jsonValue = await AsyncStorage.getItem('user');
+        return jsonValue != null ? JSON.parse(jsonValue) : null;
+      } catch (e) {
+        console.log(e);
+      }
+    }
+    fetchData()
+      .then((data) => setUser(data))
+      .catch((error) => console.log(error));
+  }, [!isChanged]);
+
   return (
     <View style={{ marginVertical: 10, backgroundColor: '#fff', width: width }}>
       <View style={styles.header}>
-        <View style={styles.left}>
-          <Avatar
-            size="medium"
-            rounded
-            icon={{ name: 'user', type: 'font-awesome' }}
-            containerStyle={{ backgroundColor: 'gray' }}
-          />
-          <Text style={styles.userName}>{post.userName}</Text>
+        <View>
+          <TouchableOpacity onPress={() => handleOnPress(post)} style={styles.left}>
+            {post.avatar ? (
+              <Avatar
+                size="medium"
+                rounded
+                source={{
+                  uri: `${DOMAIN}/${post.avatar}`,
+                }}
+              />
+            ) : (
+              <Avatar
+                size="medium"
+                rounded
+                icon={{ name: 'user', type: 'font-awesome' }}
+                containerStyle={{ backgroundColor: 'gray' }}
+              />
+            )}
+            <Text style={styles.userName}>{post.full_name ? post.full_name : post.username}</Text>
+          </TouchableOpacity>
         </View>
         <View style={styles.right}>
           <Icon name="more-vert" type="material" color="gray" />
         </View>
       </View>
       <View style={styles.caption}>
-        <Text style={{ fontSize: 18 }}>{post.caption}</Text>
+        <Text style={{ fontSize: 18 }}>{post.title}</Text>
       </View>
-      <ImageComp images={post.images} />
+      <ImageComp images={post.photos} />
       <View style={styles.footer}>
         <View style={styles.likeIcons}>
           <Icon

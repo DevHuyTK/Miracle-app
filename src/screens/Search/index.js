@@ -1,33 +1,53 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { SafeAreaView, TouchableHighlight, StyleSheet, FlatList, Alert } from 'react-native';
 import { View, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from 'react-native-vector-icons';
 import { Avatar, ListItem, SearchBar } from 'react-native-elements';
 import { DOMAIN } from '../../store/constant';
+import { ChangeDataContext } from '../../contexts/ChangeData';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-function Search({ navigation: { goBack } }) {
+function Search({ navigation }) {
   let loading = false;
-  const data = [
-    {
-      email: 'huy@gmail.com',
-      title: 'Huy đang code API',
-      subTitle: 'gánh team',
-    },
-    {
-      email: 'doanh@gmail.com',
-      title: 'Doanh đang viết đặc tả',
-      subTitle: 'đọc khó hiểu vl :v',
-    },
-    {
-      email: 'thang@gmail.com',
-      title: 'Thắng đang code UI',
-      subTitle: 'nghịch là chính :)',
-    },
-  ];
+  const [user, setUser] = useState({});
   const [datas, setDatas] = useState([]);
   const [status, setStatus] = useState([]);
   const [searchData, setSearchData] = useState([]);
   const [text, setText] = useState('');
+  const { isChanged, setIsChanged } = useContext(ChangeDataContext);
+
+  const handleOnPress = async (item) => {
+    const token = await AsyncStorage.getItem('token');
+    fetch(`${DOMAIN}/api/photo/photo-targetuser?userId=${item._id}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => response.json())
+      .then(async (res) => {
+        navigation.navigate('YourScreen', {
+          data: item,
+          token,
+          posts: res.data,
+          user,
+        });
+      });
+  };
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const jsonValue = await AsyncStorage.getItem('user');
+        return jsonValue != null ? JSON.parse(jsonValue) : null;
+      } catch (e) {
+        console.log(e);
+      }
+    }
+    fetchData()
+      .then((data) => setUser(data))
+      .catch((error) => console.log(error));
+  }, [!isChanged]);
 
   useEffect(() => {
     fetch(`${DOMAIN}/api/user/get-users`, {
@@ -69,7 +89,7 @@ function Search({ navigation: { goBack } }) {
             underlayColor="#999"
             activeOpacity={0.5}
             style={styles.btnBack}
-            onPress={() => goBack()}
+            onPress={() => navigation.goBack()}
           >
             <MaterialIcons name="chevron-left" color="black" size={30} />
           </TouchableHighlight>
@@ -110,7 +130,7 @@ function Search({ navigation: { goBack } }) {
         data={searchData}
         renderItem={({ item, key }) => (
           <View>
-            <ListItem key={key} onPress={() => Alert.alert('press')}>
+            <ListItem key={key} onPress={() => handleOnPress(item)}>
               {item.avatar ? (
                 <Avatar
                   size="medium"
@@ -129,7 +149,9 @@ function Search({ navigation: { goBack } }) {
               )}
               {/* <Avatar rounded source={DOMAIN/item.avatar} /> */}
               <ListItem.Content>
-                <ListItem.Title style={{ fontWeight: 'bold' }}>{item.full_name}</ListItem.Title>
+                <ListItem.Title style={{ fontWeight: 'bold' }}>
+                  {item.full_name ? item.full_name : item.username}
+                </ListItem.Title>
                 <ListItem.Subtitle>{item.username}</ListItem.Subtitle>
               </ListItem.Content>
               <ListItem.Chevron color="white" />

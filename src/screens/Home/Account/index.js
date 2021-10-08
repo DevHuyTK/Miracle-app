@@ -102,7 +102,6 @@ function Account({ navigation }) {
 
   const handleLogout = async () => {
     navigation.navigate('Login');
-    await AsyncStorage.setItem('showIntro', JSON.stringify(false));
     await AsyncStorage.removeItem('token');
     await AsyncStorage.removeItem('user');
   };

@@ -14,11 +14,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DOMAIN } from '../../../store/constant';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 import { LinearGradient } from 'expo-linear-gradient';
+import { connect } from 'react-redux';
+import {getAccountNewFeed, getAccountUserNewFeed, getAllAccount} from '../../../store/Actions/AccountActions'
 
 const img = require('../../../../assets/logo.png');
 
 //This's what u see (_ _")
-function Login({ navigation }) {
+function Login(props) {
   const [userName, serUserName] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -42,11 +44,14 @@ function Login({ navigation }) {
         if (res.status === 1) {
           await AsyncStorage.setItem('token', res.token);
           await AsyncStorage.setItem('user', JSON.stringify(res.user));
-          navigation.navigate('Home');
+          props.getNewFeed(res.token);
+          props.getUserNewFeed(res.token);
+          props.getAllUser();
           setStatus('');
           serUserName('');
           setPassword('');
           setLoading(false);
+          props.navigation.navigate('Home');
         } else {
           setStatus(res.message);
           setPassword('');
@@ -64,10 +69,11 @@ function Login({ navigation }) {
   };
 
   const handleChangeStack = () => {
-    navigation.navigate('Signup2');
+    props.navigation.navigate('Signup2');
   };
 
   LogBox.ignoreAllLogs(true);
+
   return (
     <LinearGradient colors={['#2B92E4', '#6FC7E1']} style={styles.login}>
       <View style={styles.logo}>
@@ -109,6 +115,23 @@ function Login({ navigation }) {
     </LinearGradient>
   );
 }
+const mapStateToProps = (state) => ({
+  newfeed: state.account.newfeed,
+});
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    getNewFeed: (data) => {
+      dispatch(getAccountNewFeed(data));
+    },
+    getUserNewFeed: (data) => {
+      dispatch(getAccountUserNewFeed(data));
+    },
+    getAllUser: (data) => {
+      dispatch(getAllAccount(data));
+    },
+  };
+};
 
 //Style - Like CSS bro :)
 const styles = StyleSheet.create({
@@ -198,4 +221,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Login;
+export default connect(mapStateToProps, mapDispatchToProps)(Login);

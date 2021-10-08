@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   avatar: {
-    width: 40,
+    width: 65,
     overflow: 'hidden',
     borderRadius: 100,
   },

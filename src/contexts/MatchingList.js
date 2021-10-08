@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react'
-import AsyncStorage from '@react-native-community/async-storage'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ChangeDataContext } from './ChangeData'
+import {DOMAIN} from '../store/constant'
 
 export const MatchingListContext = React.createContext()
 
@@ -9,7 +10,7 @@ export function MatchingListProvider(props) {
   const { isChanged, setIsChanged } = useContext(ChangeDataContext)
   const updateMatchingList = async () => {
     const token = await AsyncStorage.getItem('token')
-    fetch(`https://pets-tinder.herokuapp.com/api/user/can-matching-list`, {
+    fetch(`${DOMAIN}/api/user/can-matching-list`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,

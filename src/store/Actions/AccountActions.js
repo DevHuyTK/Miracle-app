@@ -1,38 +1,21 @@
 import * as types from '../constant';
 
-export function getAllAccounts(payload) {
+export function getAccountNewFeed(payload) {
   return {
-    type: types.GET_ACCOUNT_REQUEST,
+    type: types.GET_NEWFEED_REQUEST,
     payload,
   };
 }
-export function registerAccount(payload) {
+export function getAccountUserNewFeed(payload) {
   return {
-    type: types.ADD_ACCOUNT_REQUEST,
+    type: types.GET_USER_NEWFEED_REQUEST,
     payload,
   };
 }
-export function editAccount(payload) {
+export function getAllAccount(payload) {
   return {
-    type: types.EDIT_ACCOUNT_REQUEST,
+    type: types.GET_ALL_USER_REQUEST,
     payload,
   };
 }
-export function deleteAccount(payload) {
-  return {
-    type: types.DELETE_ACCOUNT_REQUEST,
-    payload,
-  };
-}
-export function adminDeleteAccount(payload) {
-  return {
-    type: types.ADMIN_DELETE_ACCOUNT_REQUEST,
-    payload,
-  };
-}
-export function singInAccount(payload) {
-  return {
-    type: types.LOGIN_ACCOUNT_REQUEST,
-    payload,
-  };
-}
+

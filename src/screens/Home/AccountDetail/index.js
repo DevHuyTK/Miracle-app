@@ -47,6 +47,7 @@ function accDetail({ navigation }) {
   const [gender, setGender] = useState('');
   const [phone, setPhone] = useState('');
   const [fullName, setFullName] = useState('');
+  const [description, setDescription] = useState('');
   const [age, setAge] = useState('');
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState('');
@@ -63,11 +64,12 @@ function accDetail({ navigation }) {
     fetchData()
       .then((data) => {
         setAddress(data.address),
-          setPhone(data.phone),
-          setEmail(data.email),
-          setGender(data.gender),
-          setAge(data.age),
-          setFullName(data.full_name);
+        setPhone(data.phone),
+        setEmail(data.email),
+        setGender(data.gender),
+        setAge(data.age),
+        setFullName(data.full_name);
+        setDescription(data.description);
       })
       .catch((error) => console.log(error));
   }, [isChanged]);
@@ -81,6 +83,7 @@ function accDetail({ navigation }) {
       age,
       address,
       email,
+      description,
       gender,
     };
     fetch(`${DOMAIN}/api/user/update`, {
@@ -97,6 +100,7 @@ function accDetail({ navigation }) {
           await AsyncStorage.setItem('user', JSON.stringify(res.data));
           await navigation.navigate('Account');
           setLoading(false);
+          setIsChanged(!isChanged);
         } else {
           setStatus(res.message);
           await Alert.alert(res.message);
@@ -214,6 +218,27 @@ function accDetail({ navigation }) {
               />
             </View>
           </View>
+          <View>
+            <View>
+              <Text style={styles.itemText}>Thêm mô tả</Text>
+            </View>
+            <View style={styles.textAreaContainer}>
+              <TextInput
+                style={styles.textArea}
+                underlineColorAndroid="transparent"
+                placeholder="Type something"
+                placeholderTextColor="grey"
+                numberOfLines={20}
+                multiline={true}
+                autoCapitalize="none"
+                name="description"
+                onChangeText={(event) => {
+                  setDescription(event);
+                }}
+                value={description}
+              />
+            </View>
+          </View>
         </View>
         <Text style={styles.noteText}>
           Số điện thoại và Email đã xác minh giúp bảo mật tài khoản của bạn
@@ -324,7 +349,15 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: '#efedf3',
   },
-
+  textAreaContainer: {
+    borderColor: '#dddddd',
+    borderWidth: 1,
+    padding: 5,
+  },
+  textArea: {
+    height: 150,
+    justifyContent: 'flex-start',
+  },
   vip: {
     width: '100%',
     padding: 10,

@@ -16,6 +16,7 @@ import AccountDetails from '../screens/Home/AccountDetail';
 import CreatePost from '../screens/CreatePost';
 import ChangePassword from '../screens/Account/ChangePassword'
 import AvatarScreen from '../screens/Account/AvatarScreen'
+import YourScreen from '../screens/Account/YourScreen'
 import { ChangeDataProvider } from '../contexts/ChangeData';
 
 const Stack = createStackNavigator();
@@ -29,7 +30,7 @@ function Home() {
         name="Community"
         component={Community}
         options={{
-          tabBarLabel: 'Community',
+          tabBarLabel: 'Trang cộng đồng',
           tabBarIcon: ({ color, size }) => <FontAwesome name="group" color={color} size={size} />,
         }}
       />
@@ -37,7 +38,7 @@ function Home() {
         name="Personal"
         component={Personal}
         options={{
-          tabBarLabel: 'Personal',
+          tabBarLabel: 'Trang cá nhân',
           tabBarIcon: ({ color, size }) => (
             <FontAwesome name="user-circle" color={color} size={size} />
           ),
@@ -47,7 +48,7 @@ function Home() {
         name="Chat"
         component={Chat}
         options={{
-          tabBarLabel: 'Message',
+          tabBarLabel: 'Tin nhắn',
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="message" color={color} size={size} />
           ),
@@ -57,7 +58,7 @@ function Home() {
         name="Account"
         component={Account}
         options={{
-          tabBarLabel: 'Account',
+          tabBarLabel: 'Tài khoản',
           tabBarIcon: ({ color, size }) => <MaterialIcons name="menu" color={color} size={size} />,
         }}
       />
@@ -78,6 +79,7 @@ export default function Navigation() {
           <Stack.Screen name="CreatePost" component={CreatePost} />
           <Stack.Screen name="ChangePassword" component={ChangePassword} />
           <Stack.Screen name="Avatar" component={AvatarScreen} />
+          <Stack.Screen name="YourScreen" component={YourScreen} />
           <Stack.Screen name="ChatBox" component={ChatBox} />
           <Stack.Screen name="SearchChat" component={SearchChat} />
         </Stack.Navigator>

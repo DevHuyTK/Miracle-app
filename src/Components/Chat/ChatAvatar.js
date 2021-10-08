@@ -1,28 +1,18 @@
 import React from 'react';
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
-import { Avatar } from 'react-native-elements';
+import { StyleSheet, View, Text, TouchableOpacity, ImageBackground } from 'react-native';
 import {DOMAIN} from '../../store/constant'
 
+
+const img = require('../../../assets/dinesh.jpg')
 
 function ChatAvatar({ name, avatar, onPress }) {
   return (
     <TouchableOpacity style={styles.avatar} onPress={onPress}>
-      {avatar ? (
-        <Avatar
-          size="medium"
-          rounded
-          source={{
-            uri: `${DOMAIN}/${avatar}`,
-          }}
-        />
-      ) : (
-        <Avatar
-          size="medium"
-          rounded
-          icon={{ name: 'user', type: 'font-awesome' }}
-          containerStyle={{ backgroundColor: 'gray' }}
-        />
-      )}
+      
+      <ImageBackground
+        source={avatar ? { uri: `${DOMAIN}/${avatar}` } : img}
+        style={styles.image}
+      />
       <View style={styles.info}>
         <Text style={styles.name}>{name}</Text>
       </View>
@@ -32,22 +22,21 @@ function ChatAvatar({ name, avatar, onPress }) {
 
 const styles = StyleSheet.create({
   avatar: {
-    width: 75,
+    width: 65,
     height: 100,
     margin: 8,
   },
   image: {
     borderRadius: 200,
     overflow: 'hidden',
-    width: 75,
-    height: 75,
+    width: 65,
+    height: 65,
   },
   info: {
     justifyContent: 'center',
   },
   name: {
-    position: 'relative',
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: '500',
     marginTop: 5,
     textAlign: 'center',

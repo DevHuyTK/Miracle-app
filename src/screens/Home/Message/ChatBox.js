@@ -1,103 +1,102 @@
-import { StyleSheet, ScrollView, View, Text } from 'react-native'
-import { getStatusBarHeight } from 'react-native-status-bar-height'
-import React, { useEffect, useState, useRef } from 'react'
-import ChatBoxTitle from '../../../Components/Chat/ChatBoxTitle'
-import ChatInput from '../../../Components/Chat/ChatInput'
-import socketIOClient from 'socket.io-client'
-import {DOMAIN} from '../../../store/constant'
+import { StyleSheet, FlatList, View, Text, SafeAreaView } from 'react-native';
+import { getStatusBarHeight } from 'react-native-status-bar-height';
+import React, { useEffect, useState, useRef } from 'react';
+import ChatBoxTitle from '../../../Components/Chat/ChatBoxTitle';
+import ChatInput from '../../../Components/Chat/ChatInput';
+import socketIOClient from 'socket.io-client';
+import { DOMAIN } from '../../../store/constant';
 
 const ChatBox = ({ navigation, route }) => {
-  const socket = socketIOClient(DOMAIN)
-  const scrollView = useRef()
-  const { data, token, chat, user } = route.params
-  const [chatList, setChatList] = useState([])
-  const [message, setMessage] = useState('')
-  const [loading, setLoading] = useState(false)
-
-  useEffect(() => {
-    setChatList(chat)
-  }, [chat])
+  const socket = socketIOClient(DOMAIN);
+  const scrollView = useRef();
+  const { data, token, chat, user } = route.params;
+  const [chatList, setChatList] = useState([]);
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  // const { setMatchingList } = useContext(MatchingListContext)
 
   useEffect(() => {
     socket.emit('join', {
       token: token,
       userIds: [data._id],
-    })
+    });
     socket.emit('seen-message', {
       token: token,
       userId: data._id,
+    });
+    socket.on('seen-message-response', (data) => {
+      console.log('a')
     })
-    // socket.on('seen-message-response', (data) => {
-    //   console.log('seen-message-response')
-    //   setMatchingList(data.data)
-    // })
     socket.on('send-message-response', (data) => {
-      console.log('send-message-response')
-      setMessage('')
-      setLoading(false)
-      setChatList((prevState) => [...prevState, data.data])
-    })
-  }, [])
+      console.log(data)
+      console.log('send-message-response');
+      setMessage('');
+      setLoading(false);
+      setChatList((prevState) => [...prevState, data.data]);
+    });
+  }, []);
+
+  console.log(chatList);
 
   const handleOnPress = () => {
-    setLoading(true)
+    setLoading(true);
     socket.emit('join', {
       token: token,
       userIds: [data._id],
-    })
+    });
     socket.emit('send-message', {
       token: token,
       userId: data._id,
       message: message,
-    })
-  }
+    });
+  };
 
   return (
-    <View
-      style={{
-        backgroundColor: '#fff',
-        marginTop: getStatusBarHeight(),
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
-      <ChatBoxTitle
-        title={'Sửa thông tin'}
-        onPress={() => navigation.navigate('Chat')}
-        avatar={data?.avatar}
-        name={data?.full_name}
-      />
-      <ScrollView
-        style={styles.chatBox}
-        ref={scrollView}
-        onContentSizeChange={() =>
-          scrollView.current.scrollToEnd({ animated: true })
-        }
+    <SafeAreaView style={{flex: 1}}>
+      <View
+        style={{
+          backgroundColor: '#fff',
+          marginTop: getStatusBarHeight(),
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
       >
-        <View style={{ paddingBottom: 20 }}>
-          {chatList?.map((item, index) => {
-            const isUserSending = item.user_post._id === user._id
-            return (
-              <View key={index} style={styles.chat}>
-                <Text
-                  style={isUserSending ? styles.chatRight : styles.chatLeft}
-                >
-                  {item.message}
-                </Text>
-              </View>
-            )
-          })}
-        </View>
-      </ScrollView>
-      <ChatInput
-        loading={loading}
-        message={message}
-        onPress={handleOnPress}
-        onChange={(value) => setMessage(value)}
-      />
-    </View>
-  )
-}
+        <ChatBoxTitle
+          title={'Sửa thông tin'}
+          onPress={() => navigation.navigate('Chat')}
+          avatar={data?.avatar}
+          name={data?.full_name}
+        />
+        <FlatList
+          style={styles.chatBox}
+          ref={scrollView}
+          onContentSizeChange={() => scrollView.current.scrollToEnd({ animated: true })}
+          keyExtractor={chatList.message}
+        >
+          <View style={{ paddingBottom: 20 }}>
+            {chatList?.map((item, index) => {
+              const isUserSending = item.user_post._id === user._id;
+              return (
+                <View key={index} style={styles.chat}>
+                  <Text style={isUserSending ? styles.chatRight : styles.chatLeft}>
+                    {item.message}
+                    {console.log(item.message)}
+                  </Text>
+                </View>
+              );
+            })}
+          </View>
+        </FlatList>
+        <ChatInput
+          loading={loading}
+          message={message}
+          onPress={handleOnPress}
+          onChange={(value) => setMessage(value)}
+        />
+      </View>
+    </SafeAreaView>
+  );
+};
 const styles = StyleSheet.create({
   chatBox: {
     height: '79%',
@@ -135,6 +134,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     color: '#000',
   },
-})
+});
 
-export default ChatBox
+export default ChatBox;
