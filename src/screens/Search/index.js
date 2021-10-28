@@ -18,21 +18,13 @@ function Search({ navigation }) {
 
   const handleOnPress = async (item) => {
     const token = await AsyncStorage.getItem('token');
-    fetch(`${DOMAIN}/api/photo/photo-targetuser?userId=${item._id}`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((response) => response.json())
-      .then(async (res) => {
-        navigation.navigate('YourScreen', {
-          data: item,
-          token,
-          posts: res.data,
-          user,
-        });
-      });
+
+    await navigation.navigate('YourScreen', {
+      data: item,
+      token,
+      posts_userId: item._id,
+      user,
+    });
   };
 
   useEffect(() => {
@@ -166,7 +158,7 @@ function Search({ navigation }) {
             />
           </View>
         )}
-        keyExtractor={(item) => item.email}
+        keyExtractor={(item) => item._id}
         ListHeaderComponent={renderHeader()}
       />
     </View>

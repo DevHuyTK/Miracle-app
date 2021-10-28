@@ -7,7 +7,6 @@ export default function HeaderInfo({ userData, totalData, navigation }) {
   const userFollow = userData?.follower_list?.length;
   const userFollowing = userData?.following_list?.length;
 
-  console.log(userFollow, userFollowing);
   return (
     <View>
       <View backgroundColor="#fff">

@@ -1,13 +1,43 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { View, FlatList, Text } from 'react-native';
 import Post from '../../Components/Post';
+import { ChangeDataContext } from '../../contexts/ChangeData';
 import YourHeaderInfo from '../../Components/Profile/YourHeaderInfo';
+import LottieView from 'lottie-react-native';
+import { DOMAIN } from '../../store/constant';
 
 function YourScreen({ navigation, route }) {
-  const { data, token, posts, user } = route.params;
+  const [posts, setPosts] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const { isChanged, setIsChanged } = useContext(ChangeDataContext);
+  const { data, token, posts_userId, user } = route.params;
+
+  useEffect(() => {
+    setIsLoading(true);
+    fetch(`${DOMAIN}/api/photo/photo-targetuser?userId=${posts_userId}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => response.json())
+      .then(async (res) => {
+        setPosts(res.data);
+        setIsLoading(false);
+      });
+  }, [!isChanged]);
+
+  // console.log(posts);
 
   const renderHeader = (loginData) => (
-    <View style={{ paddingHorizontal: 10, paddingVertical: 10, backgroundColor: 'white', marginTop: -15}}>
+    <View
+      style={{
+        paddingHorizontal: 10,
+        paddingVertical: 10,
+        backgroundColor: 'white',
+        marginTop: -15,
+      }}
+    >
       <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{loginData.full_name}</Text>
       <Text>Mô tả thêm:</Text>
       <Text>{loginData.description}</Text>
@@ -17,14 +47,33 @@ function YourScreen({ navigation, route }) {
   return (
     <View style={{ flex: 1 }}>
       <View style={{ flex: 2 }}>
-        <YourHeaderInfo userData={data} navigation={navigation} token={token} user={user} posts={posts} />
-        <FlatList
-          data={posts}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <Post post={item} />}
-          showsVerticalScrollIndicator={false}
-          ListHeaderComponent={renderHeader(data)}
+        <YourHeaderInfo
+          navigation={navigation}
+          token={token}
+          userData={data}
+          posts={posts}
+          user={user}
         />
+        {isLoading ? (
+          <LottieView
+            autoPlay
+            loop
+            speed={0.6}
+            style={{
+              height: 100,
+              alignSelf: 'center',
+            }}
+            source={require('../../../assets/Animations/8311-loading.json')}
+          />
+        ) : (
+          <FlatList
+            data={posts}
+            keyExtractor={(item) => item._id}
+            renderItem={({ item }) => <Post post={item} />}
+            showsVerticalScrollIndicator={false}
+            ListHeaderComponent={renderHeader(data)}
+          />
+        )}
       </View>
     </View>
   );

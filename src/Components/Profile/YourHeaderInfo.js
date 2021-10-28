@@ -4,21 +4,23 @@ import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-nati
 import socketIOClient from 'socket.io-client';
 import { DOMAIN } from '../../store/constant';
 
-export default function YourHeaderInfo({ userData, navigation, token, user, posts }) {
+export default function YourHeaderInfo({ navigation, token, userData, posts, user }) {
   const socket = socketIOClient(DOMAIN);
+  
+  const userFollow = userData?.follower_list?.length;
+  const userFollowing = userData?.following_list?.length;
 
-  const handleFollow = async (userData) => {
+  const handleFollow = async (user) => {
     socket.emit('follow-user', {
       token: token,
-      userId: userData._id,
+      userId: user._id,
     });
-    socket.on('follow-user-response', (userData) => {
-      console.log(userData, 'a');
-      // setMatchingList(userData.userData)
+    socket.on('follow-user-response', (user) => {
+      console.log(user, 'a');
+      // setMatchingList(user.user)
     });
   };
   const handleOnPress = async (item) => {
-      console.log(item);
     fetch(`${DOMAIN}/api/chat?userId=${item._id}`, {
       method: 'GET',
       headers: {
@@ -80,11 +82,11 @@ export default function YourHeaderInfo({ userData, navigation, token, user, post
                   <Text style={{ fontSize: 12, color: 'gray' }}>Bài viết</Text>
                 </View>
                 <View style={{ alignItems: 'center' }}>
-                  <Text>{Object.keys(userData?.follower_list).length}</Text>
+                  <Text>{userFollow}</Text>
                   <Text style={{ fontSize: 12, color: 'gray' }}>Người theo dõi</Text>
                 </View>
                 <View style={{ alignItems: 'center' }}>
-                  <Text>{Object.keys(userData?.following_list).length}</Text>
+                  <Text>{userFollowing}</Text>
                   <Text style={{ fontSize: 12, color: 'gray' }}>Đang theo dõi</Text>
                 </View>
               </View>
@@ -104,7 +106,7 @@ export default function YourHeaderInfo({ userData, navigation, token, user, post
                 borderRadius: 6,
               }}
             >
-              {user.following_list.find((item) => item.user_id.toString() == userData._id) ? (
+              {user?.following_list.find((item) => item.user_id.toString() == userData._id) ? (
                 <Text>Hủy theo dõi</Text>
               ) : (
                 <Text>Theo dõi</Text>
@@ -142,6 +144,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderBottomWidth: 0.5,
     borderBottomColor: 'gray',
+    backgroundColor: 'white',
   },
   left: {
     flexDirection: 'row',

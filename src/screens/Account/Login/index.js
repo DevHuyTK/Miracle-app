@@ -9,13 +9,22 @@ import {
   ImageBackground,
   LogBox,
   ActivityIndicator,
+  SafeAreaView,
+  Keyboard,
+  TouchableWithoutFeedback,
+  Modal,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DOMAIN } from '../../../store/constant';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 import { LinearGradient } from 'expo-linear-gradient';
 import { connect } from 'react-redux';
-import {getAccountNewFeed, getAccountUserNewFeed, getAllAccount} from '../../../store/Actions/AccountActions'
+import {
+  getAccountNewFeed,
+  getAccountUserNewFeed,
+  getAllAccount,
+} from '../../../store/Actions/AccountActions';
+import LottieView from 'lottie-react-native';
 
 const img = require('../../../../assets/logo.png');
 
@@ -25,6 +34,27 @@ function Login(props) {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState('');
+  const [modelVisible, setModelVisible] = useState(false);
+
+  const errorModel = () => {
+    return (
+      <TouchableOpacity style={styles.error} onPress={() => setModelVisible(false)}>
+        <View style={styles.errorContainer}>
+          <LottieView
+            autoPlay
+            loop={false}
+            speed={1}
+            style={{
+              height: 150,
+              alignSelf: 'center',
+            }}
+            source={require('../../../../assets/Animations/43899-false-animation.json')}
+          />
+          <Text style={styles.errorText}>{status}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   const handleLogin = () => {
     setLoading(true);
@@ -54,6 +84,7 @@ function Login(props) {
           props.navigation.navigate('Home');
         } else {
           setStatus(res.message);
+          setModelVisible(true);
           setPassword('');
           // await Alert.alert(res.message);
           setLoading(false);
@@ -75,44 +106,59 @@ function Login(props) {
   LogBox.ignoreAllLogs(true);
 
   return (
-    <LinearGradient colors={['#2B92E4', '#6FC7E1']} style={styles.login}>
-      <View style={styles.logo}>
-        <ImageBackground source={img} style={styles.image} />
-        <Text style={styles.logoText}>miracle</Text>
-      </View>
-      <TextInput
-        style={styles.input}
-        underlineColorAndroid="transparent"
-        placeholder="Tên đăng nhập"
-        placeholderTextColor="#666"
-        autoCapitalize="none"
-        value={userName}
-        onChangeText={(value) => handleOnChangeUserName(value)}
-      />
-      <TextInput
-        secureTextEntry={true}
-        style={styles.input}
-        underlineColorAndroid="transparent"
-        placeholder="Mật khẩu"
-        placeholderTextColor="#666"
-        autoCapitalize="none"
-        value={password}
-        onChangeText={(value) => handleOnChangePassword(value)}
-      />
-      <TouchableOpacity style={styles.button2} onPress={handleLogin}>
-        {loading ? (
-          <ActivityIndicator size={35} color="#fff" />
-        ) : (
-          <Text style={styles.buttonText3}>ĐĂNG NHẬP</Text>
-        )}
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.buttonDK} onPress={handleChangeStack}>
-        <Text style={styles.buttonText2}>Chưa có tài khoản đăng ký ngay</Text>
-      </TouchableOpacity>
-      <View>
-        <Text style={styles.error}>{status}</Text>
-      </View>
-    </LinearGradient>
+    <SafeAreaView>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <LinearGradient colors={['#2B92E4', '#6FC7E1']}>
+          <View>
+            <View style={styles.login}>
+              <View style={styles.logo}>
+                <ImageBackground source={img} style={styles.image} />
+                <Text style={styles.logoText}>miracle</Text>
+              </View>
+              <TextInput
+                style={styles.input}
+                underlineColorAndroid="transparent"
+                placeholder="Tên đăng nhập"
+                placeholderTextColor="#666"
+                autoCapitalize="none"
+                value={userName}
+                onChangeText={(value) => handleOnChangeUserName(value)}
+              />
+              <TextInput
+                secureTextEntry={true}
+                style={styles.input}
+                underlineColorAndroid="transparent"
+                placeholder="Mật khẩu"
+                placeholderTextColor="#666"
+                autoCapitalize="none"
+                value={password}
+                onChangeText={(value) => handleOnChangePassword(value)}
+              />
+              <TouchableOpacity style={styles.button2} onPress={handleLogin}>
+                {loading ? (
+                  <ActivityIndicator size={35} color="#fff" />
+                ) : (
+                  <Text style={styles.buttonText3}>ĐĂNG NHẬP</Text>
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.buttonDK} onPress={handleChangeStack}>
+                <Text style={styles.buttonText2}>Chưa có tài khoản đăng ký ngay</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <Modal
+            animationType="slide"
+            visible={modelVisible}
+            transparent={true}
+            onRequestClose={() => {
+              setModelVisible(false);
+            }}
+          >
+            {errorModel()}
+          </Modal>
+        </LinearGradient>
+      </TouchableWithoutFeedback>
+    </SafeAreaView>
   );
 }
 const mapStateToProps = (state) => ({
@@ -136,11 +182,24 @@ const mapDispatchToProps = (dispatch) => {
 //Style - Like CSS bro :)
 const styles = StyleSheet.create({
   error: {
-    width: '100%',
-    textAlign: 'center',
-    color: '#F9476C',
-    fontSize: 17,
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.2)',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  errorContainer: {
+    backgroundColor: 'white',
+    width: '50%',
+    borderRadius: 50,
+    position: 'absolute',
+    left: '25%',
+  },
+  errorText: {
+    fontSize: 20,
     fontWeight: '700',
+    color: 'red',
+    textAlign: 'center',
+    marginBottom: 20,
   },
   titleView: {
     position: 'absolute',

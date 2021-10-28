@@ -1,85 +1,16 @@
 import React, { useEffect, useState, useContext } from 'react';
-import {
-  View,
-  Text,
-  Alert,
-  StyleSheet,
-  Button,
-  Image,
-  CameraRoll,
-  FlatList,
-  SafeAreaView,
-  TouchableOpacity,
-} from 'react-native';
+import { View, StyleSheet, FlatList, SafeAreaView } from 'react-native';
 import Post from '../../../Components/Post';
 import Header from '../../../Components/Header';
-import ImagePicker from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Avatar } from 'react-native-elements';
-import { FontAwesome } from '@expo/vector-icons';
 import { ChangeDataContext } from '../../../contexts/ChangeData';
 import { connect } from 'react-redux';
+import Newfeeds from '../../../Components/Newfeeds';
+import LottieView from 'lottie-react-native';
 
-import { DOMAIN } from '../../../store/constant';
-
-function Community(props) {
-  const [image, setImage] = useState(null);
+function Community({ navigation, ...props }) {
   const [loginData, setLoginData] = useState({});
   const { isChanged, setIsChanged } = useContext(ChangeDataContext);
-
-  renderHeader = () => {
-    return (
-      <View style={{ width: '100%', height: 100, backgroundColor: '#fff', marginBottom: 10 }}>
-        <View
-          style={{
-            width: '100%',
-            height: '60%',
-            flexDirection: 'row',
-            paddingLeft: 15,
-            alignItems: 'center',
-            borderBottomColor: 'gray',
-            borderBottomWidth: 0.5,
-          }}
-        >
-          {loginData.avatar ? (
-            <Avatar
-              size="medium"
-              rounded
-              source={{
-                uri: `${DOMAIN}/${loginData.avatar}`,
-              }}
-            />
-          ) : (
-            <Avatar
-              size="medium"
-              rounded
-              icon={{ name: 'user', type: 'font-awesome' }}
-              containerStyle={{ backgroundColor: 'gray' }}
-            />
-          )}
-          <TouchableOpacity
-            onPress={() => props.navigation.navigate('CreatePost')}
-            style={{ width: '80%', marginLeft: 10, borderRadius: 10, paddingLeft: 6 }}
-          >
-            <Text style={{ color: 'gray', fontSize: 20 }}>Bạn đang nghĩ gì vậy?</Text>
-          </TouchableOpacity>
-        </View>
-        <TouchableOpacity
-          // onPress={chooseImage}
-          style={{
-            width: '100%',
-            height: '40%',
-            flexDirection: 'row',
-            alignItems: 'center',
-            paddingLeft: 20,
-          }}
-        >
-          <FontAwesome name="image" color="green" size={25} />
-          <Text style={{ color: 'black', marginLeft: 10, fontSize: 20 }}>Ảnh</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  };
 
   useEffect(() => {
     async function fetchData() {
@@ -97,16 +28,30 @@ function Community(props) {
 
   return (
     <View style={{ flex: 1 }}>
-      <Header onNavigation={props.navigation} />
-      {/* {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />} */}
+      <Header onNavigation={navigation} />
       <SafeAreaView style={{ flex: 2 }}>
-        <FlatList
-          data={Object.values(props.newfeed)}
-          keyExtractor={(item) => item._id}
-          renderItem={({ item }) => <Post onNavigation={props.navigation} post={item} />}
-          showsVerticalScrollIndicator={false}
-          ListHeaderComponent={renderHeader()}
-        />
+        {props?.newfeed ? (
+          <FlatList
+            data={Object.values(props.newfeed)}
+            keyExtractor={(item) => item._id}
+            renderItem={({ item }) => (
+              <Post onNavigation={navigation} post={item} userData={loginData} />
+            )}
+            showsVerticalScrollIndicator={false}
+            ListHeaderComponent={<Newfeeds onNavigation={navigation} userData={loginData} />}
+          />
+        ) : (
+          <LottieView
+            autoPlay
+            loop
+            speed={0.6}
+            style={{
+              height: 100,
+              alignSelf: 'center',
+            }}
+            source={require('../../../../assets/Animations/8311-loading.json')}
+          />
+        )}
       </SafeAreaView>
     </View>
   );

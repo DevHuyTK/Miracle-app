@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   TextInput,
   Text,
@@ -13,30 +13,27 @@ import {
 import { FontAwesome } from '@expo/vector-icons';
 import { Avatar, Icon } from 'react-native-elements';
 import ImagesGrid from '../../Components/ImageGrid';
-import { ceiling } from 'prelude-ls';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ChangeDataContext } from '../../contexts/ChangeData';
-import {DOMAIN} from '../../store/constant'
+import { DOMAIN } from '../../store/constant';
 
 const { width } = Dimensions.get('window');
 
-function CreatePost(props) {
-  const [loginData, setLoginData] = useState({});
-  const { isChanged, setIsChanged } = useContext(ChangeDataContext);
+function CreatePost({ navigation, route }) {
+  const { userData } = route.params;
+  const [imageBrowserOpen, setImgeBrowserOpen] = useState(false);
+  const [photos, setPhotos] = useState([]);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const jsonValue = await AsyncStorage.getItem('user');
-        return jsonValue != null ? JSON.parse(jsonValue) : null;
-      } catch (e) {
-        console.log(e);
-      }
-    }
-    fetchData()
-      .then((data) => setLoginData(data))
-      .catch((error) => console.log(error));
-  }, [isChanged]);
+  if (imageBrowserOpen) {
+    return (
+      // <AssetsSelector
+      //   Settings={widgetSettings}
+      //   Errors={widgetErrors}
+      //   Styles={widgetStyles}
+      //   Navigator={widgetNavigator}
+      //   // Resize={widgetResize} know how to use first , perform slower results.
+      // />
+      <></>
+    );
+  }
 
   const images = [
     'https://i.imgur.com/UYiroysl.jpg',
@@ -56,7 +53,7 @@ function CreatePost(props) {
               name="keyboard-backspace"
               style="material"
               size={30}
-              onPress={() => props.navigation.goBack()}
+              onPress={() => navigation.goBack()}
             />
             <Text style={styles.leftText}>Tạo bài viết</Text>
           </View>
@@ -67,14 +64,14 @@ function CreatePost(props) {
           </View>
         </View>
         <View style={styles.userBar}>
-          {loginData.avatar ? (
+          {userData.avatar ? (
             <Avatar
               size="medium"
               rounded
               source={{
-                uri: `${DOMAIN}/${loginData.avatar}`,
+                uri: `${DOMAIN}/${userData.avatar}`,
               }}
-              onPress={() => props.navigation.navigate('AccDetail')}
+              onPress={() => navigation.navigate('AccDetail')}
             />
           ) : (
             <Avatar
@@ -82,10 +79,10 @@ function CreatePost(props) {
               rounded
               icon={{ name: 'user', type: 'font-awesome' }}
               containerStyle={{ backgroundColor: 'gray' }}
-              onPress={() => props.navigation.navigate('AccDetail')}
+              onPress={() => navigation.navigate('AccDetail')}
             />
           )}
-          <Text style={styles.userName}>{loginData.full_name}</Text>
+          <Text style={styles.userName}>{userData.full_name}</Text>
         </View>
         <TextInput
           multiline={true}
@@ -93,8 +90,8 @@ function CreatePost(props) {
           placeholder="Bạn đang nghĩ gì vậy?"
           style={styles.input}
         />
-        <ImagesGrid data={images} />
-        <TouchableOpacity style={styles.photoButton}>
+        <ImagesGrid data={photos} />
+        <TouchableOpacity style={styles.photoButton} onPress={() => setImgeBrowserOpen(true)}>
           <FontAwesome name="image" color="green" size={30} />
           <Text style={{ marginLeft: 10, fontSize: 18 }}>Ảnh</Text>
         </TouchableOpacity>

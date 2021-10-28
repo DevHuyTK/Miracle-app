@@ -45,7 +45,7 @@ function Personal(props) {
       <View style={{ flex: 2 }}>
         <FlatList
           data={props.usernewfeed}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item._id}
           renderItem={({ item }) => <Post post={item} />}
           showsVerticalScrollIndicator={false}
           ListHeaderComponent={renderHeader(loginData)}

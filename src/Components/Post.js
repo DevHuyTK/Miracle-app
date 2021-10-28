@@ -8,8 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
 
-export default function Post({ post, onNavigation }) {
-  const [user, setUser] = useState({});
+export default function Post({ post, onNavigation, userData }) {
   const [isLiked, setIsLike] = useState(false);
   const [likesCount, setLikesCount] = useState(post.likesCount);
   const { isChanged, setIsChanged } = useContext(ChangeDataContext);
@@ -23,59 +22,35 @@ export default function Post({ post, onNavigation }) {
 
   const handleOnPress = async (item) => {
     const token = await AsyncStorage.getItem('token');
-    const postAPI = `${DOMAIN}/api/photo/photo-targetuser?userId=${item.user_id}`;
     const targetUserAPI = `${DOMAIN}/api/user/get-user?userId=${item.user_id}`;
-
-    Promise.all(
-      [
-        fetch(postAPI, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }).then((res) => res.json()),
-        fetch(targetUserAPI, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }).then((res) => res.json()),
-      ]
-    ).then(([posts, targetUser]) => {
-      onNavigation.navigate('YourScreen', {
-        data: targetUser,
-        token,
-        posts: posts,
-        user,
+    fetch(targetUserAPI, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => response.json())
+      .then(async (res) => {
+        onNavigation.navigate('YourScreen', {
+          data: res.data,
+          token,
+          posts_userId: item.user_id,
+          user: userData,
+        });
       });
-    });
-
-    
   };
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const jsonValue = await AsyncStorage.getItem('user');
-        return jsonValue != null ? JSON.parse(jsonValue) : null;
-      } catch (e) {
-        console.log(e);
-      }
-    }
-    fetchData()
-      .then((data) => setUser(data))
-      .catch((error) => console.log(error));
-  }, [!isChanged]);
 
   return (
     <View style={{ marginVertical: 10, backgroundColor: '#fff', width: width }}>
       <View style={styles.header}>
         <View>
           <TouchableOpacity onPress={() => handleOnPress(post)} style={styles.left}>
-            {post.avatar ? (
+            {post?.avatar ? (
               <Avatar
                 size="medium"
                 rounded
                 source={{
-                  uri: `${DOMAIN}/${post.avatar}`,
+                  uri: `${DOMAIN}/${post?.avatar}`,
                 }}
               />
             ) : (
@@ -86,7 +61,9 @@ export default function Post({ post, onNavigation }) {
                 containerStyle={{ backgroundColor: 'gray' }}
               />
             )}
-            <Text style={styles.userName}>{post.full_name ? post.full_name : post.username}</Text>
+            <Text style={styles.userName}>
+              {post?.full_name ? post?.full_name : post?.username}
+            </Text>
           </TouchableOpacity>
         </View>
         <View style={styles.right}>
@@ -94,9 +71,9 @@ export default function Post({ post, onNavigation }) {
         </View>
       </View>
       <View style={styles.caption}>
-        <Text style={{ fontSize: 18 }}>{post.title}</Text>
+        <Text style={{ fontSize: 18 }}>{post?.title}</Text>
       </View>
-      <ImageComp images={post.photos} />
+      <ImageComp images={post?.photos} />
       <View style={styles.footer}>
         <View style={styles.likeIcons}>
           <Icon
@@ -109,7 +86,7 @@ export default function Post({ post, onNavigation }) {
           <Text style={{ marginLeft: 6, fontSize: 16 }}>{likesCount}</Text>
         </View>
         <View style={styles.postAgo}>
-          <Text style={{ fontSize: 16, color: 'gray' }}>{post.postAgo}</Text>
+          <Text style={{ fontSize: 16, color: 'gray' }}>{post?.postAgo}</Text>
         </View>
       </View>
     </View>

@@ -1,5 +1,13 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StatusBar, StyleSheet, SafeAreaView, Image } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StatusBar,
+  StyleSheet,
+  SafeAreaView,
+  Image,
+} from 'react-native';
 import { MaterialIcons } from 'react-native-vector-icons';
 
 const logo = require('../../assets/Miracle.png');
@@ -8,9 +16,9 @@ export default function Header({ onNavigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff"></StatusBar>
-      <View style={styles.imageBox}>
+      <TouchableOpacity style={styles.imageBox} onPress={() => onNavigation.navigate('Community')}>
         <Image source={logo} style={styles.image} />
-      </View>
+      </TouchableOpacity>
       <View style={styles.btnContainer}>
         <TouchableOpacity style={styles.btnSearch} onPress={() => onNavigation.navigate('Search')}>
           <MaterialIcons name="search" color="black" size={30} />

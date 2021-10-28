@@ -7,16 +7,16 @@ import Signup2 from '../screens/Account/Signup-Step2';
 import Login from '../screens/Account/Login';
 import Chat from '../screens/Home/Message/Chat';
 import ChatBox from '../screens/Home/Message/ChatBox';
-import SearchChat from '../screens/Home/Message/SearchChat'
+import SearchChat from '../screens/Home/Message/SearchChat';
 import Community from '../screens/Home/Community';
 import Personal from '../screens/Home/Personal';
 import Account from '../screens/Home/Account';
 import Search from '../screens/Search';
 import AccountDetails from '../screens/Home/AccountDetail';
 import CreatePost from '../screens/CreatePost';
-import ChangePassword from '../screens/Account/ChangePassword'
-import AvatarScreen from '../screens/Account/AvatarScreen'
-import YourScreen from '../screens/Account/YourScreen'
+import ChangePassword from '../screens/Account/ChangePassword';
+import AvatarScreen from '../screens/Account/AvatarScreen';
+import YourScreen from '../screens/Account/YourScreen';
 import { ChangeDataProvider } from '../contexts/ChangeData';
 
 const Stack = createStackNavigator();
@@ -30,8 +30,8 @@ function Home() {
         name="Community"
         component={Community}
         options={{
-          tabBarLabel: 'Trang cộng đồng',
-          tabBarIcon: ({ color, size }) => <FontAwesome name="group" color={color} size={size} />,
+          tabBarLabel: 'Trang chủ',
+          tabBarIcon: ({ color, size }) => <FontAwesome name="home" color={color} size={size} />,
         }}
       />
       <Tab.Screen
