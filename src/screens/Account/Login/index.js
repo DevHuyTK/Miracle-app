@@ -183,7 +183,7 @@ const mapDispatchToProps = (dispatch) => {
 const styles = StyleSheet.create({
   error: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.2)',
+    backgroundColor: 'rgba(0,0,0,0.6)',
     justifyContent: 'center',
     position: 'relative',
   },

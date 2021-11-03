@@ -18,33 +18,33 @@ export default function Newfeeds({ onNavigation, userData }) {
           borderBottomWidth: 0.5,
         }}
       >
-        {userData.avatar ? (
-          <Avatar
-            size="medium"
-            rounded
-            source={{
-              uri: `${DOMAIN}/${userData.avatar}`,
-            }}
-          />
-        ) : (
-          <Avatar
-            size="medium"
-            rounded
-            icon={{ name: 'user', type: 'font-awesome' }}
-            containerStyle={{ backgroundColor: 'gray' }}
-          />
-        )}
+        <TouchableOpacity onPress={() => onNavigation.navigate('Personal')}>
+          {userData.avatar ? (
+            <Avatar
+              size="medium"
+              rounded
+              source={{
+                uri: `${DOMAIN}/${userData.avatar}`,
+              }}
+            />
+          ) : (
+            <Avatar
+              size="medium"
+              rounded
+              icon={{ name: 'user', type: 'font-awesome' }}
+              containerStyle={{ backgroundColor: 'gray' }}
+            />
+          )}
+        </TouchableOpacity>
         <TouchableOpacity
-          onPress={
-            (() => onNavigation.navigate('CreatePost', {userData}))
-          }
+          onPress={() => onNavigation.navigate('CreatePost', { userData })}
           style={{ width: '80%', marginLeft: 10, borderRadius: 10, paddingLeft: 6 }}
         >
           <Text style={{ color: 'gray', fontSize: 20 }}>Bạn đang nghĩ gì vậy?</Text>
         </TouchableOpacity>
       </View>
       <TouchableOpacity
-        // onPress={() => setImgeBrowserOpen(true)}
+        onPress={() => onNavigation.navigate('ImagePicker')}
         style={{
           width: '100%',
           height: '40%',

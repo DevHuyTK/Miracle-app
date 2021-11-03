@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   TextInput,
   Text,
@@ -18,22 +18,15 @@ import { DOMAIN } from '../../store/constant';
 const { width } = Dimensions.get('window');
 
 function CreatePost({ navigation, route }) {
-  const { userData } = route.params;
-  const [imageBrowserOpen, setImgeBrowserOpen] = useState(false);
-  const [photos, setPhotos] = useState([]);
+  const { userData, photos } = route.params;
+  const [imgs, setImgs] = useState([]);
 
-  if (imageBrowserOpen) {
-    return (
-      // <AssetsSelector
-      //   Settings={widgetSettings}
-      //   Errors={widgetErrors}
-      //   Styles={widgetStyles}
-      //   Navigator={widgetNavigator}
-      //   // Resize={widgetResize} know how to use first , perform slower results.
-      // />
-      <></>
-    );
-  }
+  useEffect(() => {
+    if (photos) setImgs(photos);
+    delete route.params.photos;
+  }, [photos]);
+
+  const arrImgs = Object.assign({}, ...imgs)
 
   const images = [
     'https://i.imgur.com/UYiroysl.jpg',
@@ -90,8 +83,11 @@ function CreatePost({ navigation, route }) {
           placeholder="Bạn đang nghĩ gì vậy?"
           style={styles.input}
         />
-        <ImagesGrid data={photos} />
-        <TouchableOpacity style={styles.photoButton} onPress={() => setImgeBrowserOpen(true)}>
+        <ImagesGrid data={arrImgs.uri} />
+        <TouchableOpacity
+          style={styles.photoButton}
+          onPress={() => navigation.navigate('ImagePicker')}
+        >
           <FontAwesome name="image" color="green" size={30} />
           <Text style={{ marginLeft: 10, fontSize: 18 }}>Ảnh</Text>
         </TouchableOpacity>

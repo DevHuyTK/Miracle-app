@@ -12,7 +12,7 @@ export default function AccountItem({ parentIcon, parentTitle, list, onNavigatio
     }
     if(parentIcon === 'account-circle'){
       if(key === 0) onNavigation.navigate('AccDetail');
-      if(key === 1) onNavigation.navigate('AccDetail'); 
+      if(key === 1) onNavigation.navigate('ChangeAvatar'); 
       if(key === 2) onNavigation.navigate('ChangePassword');
     }
     if(parentIcon === 'help-outline') onNavigation.navigate('CreatePost');
