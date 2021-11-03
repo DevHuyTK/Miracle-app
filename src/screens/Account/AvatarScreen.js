@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
-import { Avatar, Image } from 'react-native-elements';
+import { Avatar, Icon } from 'react-native-elements';
 import { ChangeDataContext } from '../../contexts/ChangeData';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DOMAIN } from '../../store/constant';
@@ -31,11 +31,17 @@ function AvatarScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.titleView} onPress={() => navigation.goBack()}>
+        <Icon
+          name="keyboard-arrow-left"
+          style="material"
+          size={30}
+          onPress={() => navigation.goBack()}
+          color="white"
+        />
         <Text style={styles.title}>Trở về</Text>
       </TouchableOpacity>
       {avatar ? (
         <Avatar
-          
           source={{
             uri: `${DOMAIN}/${avatar}`,
           }}
@@ -71,10 +77,10 @@ const styles = StyleSheet.create({
   info: {
     color: '#fff',
     fontSize: 20,
-    fontWeight: "700",
+    fontWeight: '700',
     position: 'absolute',
     bottom: 100,
-    left: 20
+    left: 20,
   },
   titleView: {
     position: 'absolute',

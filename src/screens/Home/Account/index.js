@@ -10,49 +10,6 @@ import { ChangeDataContext } from '../../../contexts/ChangeData';
 function Account({ navigation }) {
   const [loginData, setLoginData] = useState({});
   const { isChanged, setIsChanged } = useContext(ChangeDataContext);
-  const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState('');
-  const [errorText, setErrorText] = useState('');
-
-  const createFormData = (imageFile) => {
-    const data = new FormData();
-    data.append('photo', {
-      name: imageFile.fileName,
-      type: imageFile.type,
-      uri: Platform.OS === 'ios' ? imageFile.uri.replace('file://', '') : imageFile.uri,
-    });
-
-    return data;
-  };
-
-  const handleUploadAvatar = async () => {
-    setErrorText('');
-    setStatus('');
-    setLoading(true);
-    const token = await AsyncStorage.getItem('token');
-    fetch(`${DOMAIN}/api/user/upload-avatar`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + token,
-      },
-      body: createFormData(imageFile),
-    })
-      .then((response) => response.json())
-      .then(async (res) => {
-        if (res.status === 1) {
-          setStatus(res.message);
-          setTimeout(() => {
-            navigation.navigate('Account');
-          }, 1000);
-          setLoading(false);
-          setIsChanged(!isChanged);
-        } else {
-          setErrorText(res.message);
-          setLoading(false);
-        }
-      });
-  };
 
   useEffect(() => {
     async function fetchData() {
