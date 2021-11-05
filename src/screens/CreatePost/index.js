@@ -17,10 +17,12 @@ import { Avatar, Icon } from 'react-native-elements';
 import ImagesGrid from '../../Components/ImageGrid';
 import { DOMAIN } from '../../store/constant';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { connect } from 'react-redux';
+import { setImage } from './../../store/Actions/ImageGridAction';
 
 const { width } = Dimensions.get('window');
 
-function CreatePost({ navigation, route }) {
+function CreatePost({ navigation, route, ...props }) {
   const { userData, photos } = route.params;
   const [imgs, setImgs] = useState([]);
   const [title, setTitle] = useState('');
@@ -134,11 +136,14 @@ function CreatePost({ navigation, route }) {
           onChangeText={(text) => setTitle(text)}
         />
         {/* <ImagesGrid data={arrImgs.uri} /> */}
-        <View style={styles.imageContainer}>
+        {/* <View style={styles.imageContainer}>
           {imgs?.map((item, index) => (
             <Image key={index} source={{ uri: item.uri }} style={styles.image} />
           ))}
         </View>
+          onChangeText={(value) => setText(value)}
+        /> */}
+        <ImagesGrid />
         <TouchableOpacity
           style={styles.photoButton}
           onPress={() => navigation.navigate('ImagePicker', { userData })}
@@ -159,6 +164,18 @@ function CreatePost({ navigation, route }) {
     </TouchableWithoutFeedback>
   );
 }
+
+const mapStateToProps = (state) => ({
+  imageGrid: state.ImagesGridReducers,
+});
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    setImageGrid: (payload) => {
+      dispatch(setImage(payload));
+    },
+  };
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -259,4 +276,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreatePost;
+export default connect(mapStateToProps, mapDispatchToProps)(CreatePost);
