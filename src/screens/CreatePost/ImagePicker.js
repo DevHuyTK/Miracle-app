@@ -3,7 +3,8 @@ import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator } from 'rea
 import * as ImageManipulator from 'expo-image-manipulator';
 import { ImageBrowser } from 'expo-image-picker-multiple';
 
-export default function ImagePicker({ navigation }) {
+export default function ImagePicker({ navigation, route }) {
+  const { userData } = route.params;
   const _getHeaderLoader = () => <ActivityIndicator size="small" color={'#0580FF'} />;
 
   const imagesCallback = (callback) => {
@@ -22,7 +23,7 @@ export default function ImagePicker({ navigation }) {
             type: 'image/jpg',
           });
         }
-        navigation.navigate('CreatePost', { photos: cPhotos });
+        navigation.navigate('CreatePost', { photos: cPhotos, userData });
       })
       .catch((e) => console.log(e));
   };
@@ -46,7 +47,7 @@ export default function ImagePicker({ navigation }) {
     );
   };
 
-  updateHandler = (count, onSubmit) => {
+  const updateHandler = (count, onSubmit) => {
     navigation.setOptions({
       title: `Đã chọn ${count}`,
       headerRight: () => _renderDoneButton(count, onSubmit),

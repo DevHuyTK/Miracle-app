@@ -9,24 +9,29 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
+  Image,
+  ActivityIndicator,
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { Avatar, Icon } from 'react-native-elements';
 import ImagesGrid from '../../Components/ImageGrid';
 import { DOMAIN } from '../../store/constant';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
 
 function CreatePost({ navigation, route }) {
   const { userData, photos } = route.params;
   const [imgs, setImgs] = useState([]);
+  const [title, setTitle] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState('');
+  const [errorText, setErrorText] = useState('');
 
-  useEffect(() => {
-    if (photos) setImgs(photos);
-    delete route.params.photos;
-  }, [photos]);
+  if (photos) setImgs(photos);
+  delete route.params.photos;
 
-  const arrImgs = Object.assign({}, ...imgs)
+  const arrImgs = Object.assign({}, ...imgs);
 
   const images = [
     'https://i.imgur.com/UYiroysl.jpg',
@@ -37,6 +42,49 @@ function CreatePost({ navigation, route }) {
     'https://i.imgur.com/UYiroysl.jpg',
     'https://i.imgur.com/UPrs1EWl.jpg',
   ];
+
+  const createFormData = (imageFile, title) => {
+    const arrImgs = Object.assign({}, ...imageFile);
+    const data = new FormData();
+    data.append('title', {
+      title,
+    });
+    data.append('photos', {
+      name: arrImgs.name,
+      type: arrImgs.type,
+      uri: Platform.OS === 'ios' ? arrImgs.uri.replace('file://', '') : arrImgs.uri,
+    });
+
+    console.log(data);
+    return data;
+  };
+
+  const handleUploadAvatar = async () => {
+    setLoading(true);
+    const token = await AsyncStorage.getItem('token');
+    fetch(`${DOMAIN}/api/photo/upload-photos`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+        Authorization: 'Bearer ' + token,
+      },
+      body: createFormData(imgs, title),
+    })
+      .then((response) => response.json())
+      .then(async (res) => {
+        if (res.status === 1) {
+          setStatus(res.message);
+          setTimeout(() => {
+            navigation.navigate('Community');
+          }, 1000);
+          setLoading(false);
+        } else {
+          setErrorText(res.message);
+          setLoading(false);
+        }
+      });
+  };
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <ScrollView style={styles.container}>
@@ -57,7 +105,7 @@ function CreatePost({ navigation, route }) {
           </View>
         </View>
         <View style={styles.userBar}>
-          {userData.avatar ? (
+          {userData?.avatar ? (
             <Avatar
               size="medium"
               rounded
@@ -82,18 +130,29 @@ function CreatePost({ navigation, route }) {
           scrollEnabled={true}
           placeholder="Bạn đang nghĩ gì vậy?"
           style={styles.input}
+          value={title}
+          onChangeText={(text) => setTitle(text)}
         />
-        <ImagesGrid data={arrImgs.uri} />
+        {/* <ImagesGrid data={arrImgs.uri} /> */}
+        <View style={styles.imageContainer}>
+          {imgs?.map((item, index) => (
+            <Image key={index} source={{ uri: item.uri }} style={styles.image} />
+          ))}
+        </View>
         <TouchableOpacity
           style={styles.photoButton}
-          onPress={() => navigation.navigate('ImagePicker')}
+          onPress={() => navigation.navigate('ImagePicker', { userData })}
         >
           <FontAwesome name="image" color="green" size={30} />
           <Text style={{ marginLeft: 10, fontSize: 18 }}>Ảnh</Text>
         </TouchableOpacity>
         <View style={styles.bottomPostContainer}>
-          <TouchableOpacity style={styles.bottomPostButton}>
-            <Text style={{ color: '#fff', fontSize: 18 }}>Đăng</Text>
+          <TouchableOpacity style={styles.bottomPostButton} onPress={() => handleUploadAvatar()}>
+            {loading ? (
+              <ActivityIndicator size={35} color="#fff" />
+            ) : (
+              <Text style={{ color: '#fff', fontSize: 16, padding: 10 }}>Đăng</Text>
+            )}
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -105,6 +164,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+
+  imageContainer: {
+    marginTop: 20,
+    flexDirection: 'row',
+    padding: 10,
+  },
+  image: {
+    width: 100,
+    height: 100,
+    resizeMode: 'cover',
   },
   header: {
     width: width,

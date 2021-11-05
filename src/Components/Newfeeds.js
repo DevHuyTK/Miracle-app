@@ -44,7 +44,7 @@ export default function Newfeeds({ onNavigation, userData }) {
         </TouchableOpacity>
       </View>
       <TouchableOpacity
-        onPress={() => onNavigation.navigate('ImagePicker')}
+        onPress={() => onNavigation.navigate('ImagePicker', { userData })}
         style={{
           width: '100%',
           height: '40%',
