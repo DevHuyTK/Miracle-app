@@ -9,34 +9,70 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
+  Image,
+  ActivityIndicator,
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { Avatar, Icon } from 'react-native-elements';
 import ImagesGrid from '../../Components/ImageGrid';
 import { DOMAIN } from '../../store/constant';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { connect } from 'react-redux';
+import { setImage } from './../../store/Actions/ImageGridAction';
 
 const { width } = Dimensions.get('window');
 
-function CreatePost({ navigation, route }) {
-  const { userData, photos } = route.params;
-  const [imgs, setImgs] = useState([]);
+function CreatePost({ navigation, route, ...props }) {
+  const { userData } = route.params;
+  const [title, setTitle] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState('');
+  const [errorText, setErrorText] = useState('');
 
-  useEffect(() => {
-    if (photos) setImgs(photos);
-    delete route.params.photos;
-  }, [photos]);
+  const createFormData = (imageFile, title) => {
+    console.log(imageFile);
+    const data = new FormData();
+    data.append('title', {
+      title,
+    });
+    for (let i = 0; i < imageFile.length; i++) {
+      data.append('photos', {
+        name: imageFile[i]?.split('/').pop(),
+        type: 'image/jpg',
+        uri: Platform.OS === 'ios' ? imageFile[i].replace('file://', '') : imageFile[i],
+      });
+    }
 
-  const arrImgs = Object.assign({}, ...imgs)
+    console.log(data);
+    return data;
+  };
 
-  const images = [
-    'https://i.imgur.com/UYiroysl.jpg',
-    'https://i.imgur.com/UPrs1EWl.jpg',
-    'https://i.imgur.com/MABUbpDl.jpg',
-    'https://i.imgur.com/KZsmUi2l.jpg',
-    'https://i.imgur.com/2nCt3Sbl.jpg',
-    'https://i.imgur.com/UYiroysl.jpg',
-    'https://i.imgur.com/UPrs1EWl.jpg',
-  ];
+  const handleUploadAvatar = async () => {
+    setLoading(true);
+    const token = await AsyncStorage.getItem('token');
+    fetch(`${DOMAIN}/api/photo/upload-photos`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+        Authorization: 'Bearer ' + token,
+      },
+      body: createFormData(props.imageGrid, title),
+    })
+      .then((response) => response.json())
+      .then(async (res) => {
+        if (res.status === 1) {
+          setStatus(res.message);
+          setTimeout(() => {
+            navigation.navigate('Community');
+          }, 1000);
+          setLoading(false);
+        } else {
+          setErrorText(res.message);
+          setLoading(false);
+        }
+      });
+  };
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <ScrollView style={styles.container}>
@@ -51,13 +87,17 @@ function CreatePost({ navigation, route }) {
             <Text style={styles.leftText}>Tạo bài viết</Text>
           </View>
           <View style={styles.right}>
-            <TouchableOpacity style={styles.topPostButton}>
-              <Text style={styles.topPostText}>Đăng</Text>
+            <TouchableOpacity style={styles.topPostButton} onPress={() => handleUploadAvatar()}>
+              {loading ? (
+                <ActivityIndicator size={35} color="#fff" />
+              ) : (
+                <Text style={styles.topPostText}>Đăng</Text>
+              )}
             </TouchableOpacity>
           </View>
         </View>
         <View style={styles.userBar}>
-          {userData.avatar ? (
+          {userData?.avatar ? (
             <Avatar
               size="medium"
               rounded
@@ -82,18 +122,24 @@ function CreatePost({ navigation, route }) {
           scrollEnabled={true}
           placeholder="Bạn đang nghĩ gì vậy?"
           style={styles.input}
+          value={title}
+          onChangeText={(text) => setTitle(text)}
         />
-        <ImagesGrid data={arrImgs.uri} />
+        <ImagesGrid />
         <TouchableOpacity
           style={styles.photoButton}
-          onPress={() => navigation.navigate('ImagePicker')}
+          onPress={() => navigation.navigate('ImagePicker', { userData })}
         >
           <FontAwesome name="image" color="green" size={30} />
           <Text style={{ marginLeft: 10, fontSize: 18 }}>Ảnh</Text>
         </TouchableOpacity>
         <View style={styles.bottomPostContainer}>
-          <TouchableOpacity style={styles.bottomPostButton}>
-            <Text style={{ color: '#fff', fontSize: 18 }}>Đăng</Text>
+          <TouchableOpacity style={styles.bottomPostButton} onPress={() => handleUploadAvatar()}>
+            {loading ? (
+              <ActivityIndicator size={35} color="#fff" />
+            ) : (
+              <Text style={{ color: '#fff', fontSize: 16, padding: 10 }}>Đăng</Text>
+            )}
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -101,10 +147,33 @@ function CreatePost({ navigation, route }) {
   );
 }
 
+const mapStateToProps = (state) => ({
+  imageGrid: state.ImagesGridReducers,
+});
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    setImageGrid: (payload) => {
+      dispatch(setImage(payload));
+    },
+  };
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+
+  imageContainer: {
+    marginTop: 20,
+    flexDirection: 'row',
+    padding: 10,
+  },
+  image: {
+    width: 100,
+    height: 100,
+    resizeMode: 'cover',
   },
   header: {
     width: width,
@@ -189,4 +258,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreatePost;
+export default connect(mapStateToProps, mapDispatchToProps)(CreatePost);

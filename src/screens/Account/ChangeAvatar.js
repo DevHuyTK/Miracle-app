@@ -1,5 +1,14 @@
-import React, { useState, useContext } from 'react';
-import { View, Text, StyleSheet, Image, Button, SafeAreaView, Dimensions } from 'react-native';
+import React, { useState, useContext, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  Button,
+  SafeAreaView,
+  Dimensions,
+  ActivityIndicator,
+} from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Divider } from 'react-native-elements';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -27,11 +36,17 @@ export default function ChangeAvatar({ navigation }) {
       return;
     }
 
-    const result = await ImagePicker.launchImageLibraryAsync();
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 4],
+      quality: 1,
+    });
+
+    console.log(result);
 
     if (!result.cancelled) {
-      setPickedImagePath(result.uri);
-      console.log(result.uri);
+      setPickedImagePath(result);
     }
   };
 
@@ -45,23 +60,31 @@ export default function ChangeAvatar({ navigation }) {
       return;
     }
 
-    const result = await ImagePicker.launchCameraAsync();
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 4],
+      quality: 1,
+    });
+
+    console.log(result);
 
     if (!result.cancelled) {
-      setPickedImagePath(result.uri);
+      setPickedImagePath(result);
     }
   };
 
-  const createFormData = (imageFile) => {
-    const data = new FormData();
-    data.append('photo', {
-      name: imageFile.fileName,
-      type: imageFile.type,
-      uri: Platform.OS === 'ios' ? imageFile.uri.replace('file://', '') : imageFile.uri,
-    });
+  //spile one string after the last '/'
+  // const getFileName = (path) => {
+  //   return path?.split('/').pop();
+  // };
 
-    return data;
-  };
+  const data = new FormData();
+  data.append('avatar', {
+    name: pickedImagePath.uri?.split('/').pop(),
+    type: 'image/jpg',
+    uri: Platform.OS === 'ios' ? `file:///${pickedImagePath.uri}` : pickedImagePath.uri,
+  });
 
   const handleUploadAvatar = async () => {
     setLoading(true);
@@ -69,20 +92,20 @@ export default function ChangeAvatar({ navigation }) {
     fetch(`${DOMAIN}/api/user/upload-avatar`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'multipart/form-data',
         Authorization: 'Bearer ' + token,
       },
-      body: createFormData(imageFile),
+      body: data,
     })
       .then((response) => response.json())
-      .then(async (res) => {
+      .then((res) => {
         if (res.status === 1) {
           setStatus(res.message);
+          setIsChanged(!isChanged);
           setTimeout(() => {
             navigation.navigate('Account');
           }, 1000);
           setLoading(false);
-          setIsChanged(!isChanged);
         } else {
           setErrorText(res.message);
           setLoading(false);
@@ -104,13 +127,21 @@ export default function ChangeAvatar({ navigation }) {
             <Text style={styles.leftText}>Cập nhật ảnh đại diện</Text>
           </View>
           <View style={styles.right}>
-            <TouchableOpacity style={styles.topPostButton}>
-              <Text style={styles.topPostText}>Đăng</Text>
-            </TouchableOpacity>
+            {pickedImagePath ? (
+              <TouchableOpacity style={styles.topPostButton} onPress={() => handleUploadAvatar()}>
+                {loading ? (
+                  <ActivityIndicator size={35} color="#fff" />
+                ) : (
+                  <Text style={{ color: '#fff', fontSize: 16, padding: 10 }}>Đăng</Text>
+                )}
+              </TouchableOpacity>
+            ) : (
+              <></>
+            )}
           </View>
         </View>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity onPress={showImagePicker} style={styles.butonSelect}>
+          <TouchableOpacity onPress={() => showImagePicker()} style={styles.butonSelect}>
             <Text style={styles.buttonText}>Chọn ảnh</Text>
             <Icon
               name="keyboard-arrow-right"
@@ -120,7 +151,7 @@ export default function ChangeAvatar({ navigation }) {
             />
           </TouchableOpacity>
           <Divider width={1} />
-          <TouchableOpacity onPress={openCamera} style={styles.butonSelect}>
+          <TouchableOpacity onPress={() => openCamera()} style={styles.butonSelect}>
             <Text style={styles.buttonText}>Mở camera</Text>
             <Icon
               name="keyboard-arrow-right"
@@ -134,7 +165,7 @@ export default function ChangeAvatar({ navigation }) {
 
         <View style={styles.imageContainer}>
           {pickedImagePath !== '' && (
-            <Image source={{ uri: pickedImagePath }} style={styles.image} />
+            <Image source={{ uri: pickedImagePath.uri }} style={styles.image} />
           )}
         </View>
       </View>
@@ -160,11 +191,11 @@ const styles = StyleSheet.create({
     padding: 30,
   },
   imageContainer: {
-    marginTop: 20
+    marginTop: 20,
   },
   image: {
     width: 400,
-    height: 300,
+    height: 400,
     resizeMode: 'cover',
   },
   buttonText: {

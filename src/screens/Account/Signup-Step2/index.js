@@ -6,14 +6,19 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  Alert,
   ImageBackground,
-  ActivityIndicator
+  ActivityIndicator,
+  SafeAreaView,
+  Modal,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 import { DOMAIN } from '../../../store/constant';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 import { LinearGradient } from 'expo-linear-gradient';
 import RNPickerSelect from 'react-native-picker-select';
+import { Icon } from 'react-native-elements';
+import LottieView from 'lottie-react-native';
 
 const img = require('../../../../assets/logo.png');
 const pickerStyle = {
@@ -30,14 +35,14 @@ const pickerStyle = {
   },
   inputAndroid: {
     width: '90%',
-    backgroundColor: "#FFF",
+    backgroundColor: '#FFF',
     color: '#fff',
     height: 50,
     marginBottom: 25,
     borderRadius: 50,
     marginLeft: 20,
     paddingHorizontal: 20,
-  }
+  },
 };
 //This's what u see (_ _")
 function Register({ navigation }) {
@@ -45,12 +50,31 @@ function Register({ navigation }) {
   const [password, setPassword] = useState('');
   const [gender, setGender] = useState('');
   const [fullName, setFullName] = useState('');
-  const [status, setStatus] = useState([]);
+  const [status, setStatus] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  
-  console.log(gender);
-  
+  const [modelVisible, setModelVisible] = useState(false);
+
+  const errorModel = () => {
+    return (
+      <TouchableOpacity style={styles.error} onPress={() => setModelVisible(false)}>
+        <View style={styles.errorContainer}>
+          <LottieView
+            autoPlay
+            loop={false}
+            speed={1}
+            style={{
+              height: 150,
+              alignSelf: 'center',
+            }}
+            source={require('../../../../assets/Animations/43899-false-animation.json')}
+          />
+          <Text style={styles.errorText}>{status}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
   const handleOnPress = () => {
     setLoading(true);
     fetch(`${DOMAIN}/api/user/signup`, {
@@ -73,109 +97,138 @@ function Register({ navigation }) {
           setTimeout(() => {
             navigation.navigate('Login');
           }, 1000);
-          setStatus([res.message, true]);
-          setUserName("");
-          setGender("");
-          setFullName("");
-          setPassword("");
-          setConfirmPassword("");
+          setStatus(res.message);
+          setUserName('');
+          setGender('');
+          setFullName('');
+          setPassword('');
+          setConfirmPassword('');
           setLoading(false);
         } else {
-          setStatus([res.message, false]);
-          setPassword("");
-          setConfirmPassword("");
+          setStatus(res.message);
+          setPassword('');
+          setConfirmPassword('');
+          setModelVisible(true);
           setLoading(false);
         }
       });
   };
 
   return (
-    <View>
-      <TouchableOpacity style={styles.titleView} onPress={() => navigation.navigate('Login')}>
-        <Text style={styles.title}>Trở về</Text>
-      </TouchableOpacity>
-      <LinearGradient colors={['#2B92E4', '#6FC7E1']} style={styles.login}>
-        <View style={styles.logo}>
-          <ImageBackground source={img} style={styles.image} />
-          <Text style={styles.logoText}>miracle</Text>
-        </View>
-        <TextInput
-          style={styles.input}
-          underlineColorAndroid="transparent"
-          placeholder="Tên đăng nhập"
-          placeholderTextColor="#666"
-          autoCapitalize="none"
-          value={userName}
-          onChangeText={(value) => setUserName(value)}
-        />
-        <TextInput
-          style={styles.input}
-          underlineColorAndroid="transparent"
-          placeholder="Tên hiển thị"
-          placeholderTextColor="#666"
-          autoCapitalize="none"
-          value={fullName}
-          onChangeText={(value) => setFullName(value)}
-        />
-        <TextInput
-          secureTextEntry={true}
-          style={styles.input}
-          underlineColorAndroid="transparent"
-          placeholder="Mật khẩu"
-          placeholderTextColor="#666"
-          autoCapitalize="none"
-          value={password}
-          onChangeText={(value) => setPassword(value)}
-        />
-        <TextInput
-          secureTextEntry={true}
-          style={styles.input}
-          underlineColorAndroid="transparent"
-          placeholder="Nhập lại mật khẩu"
-          placeholderTextColor="#666"
-          autoCapitalize="none"
-          value={confirmPassword}
-          onChangeText={(value) => setConfirmPassword(value)}
-        />
-        <RNPickerSelect
-          placeholder={{
-            label: 'Lựa chọn giới tính...',
-            value: null,
-          }}
-          style={pickerStyle}
-          onValueChange={(value) => {
-            setGender(value);
-          }}
-          value={gender}
-          items={[
-            { label: 'Nam', value: 1 },
-            { label: 'Nữ', value: 0 },
-          ]}
-        />
-        <TouchableOpacity style={styles.button2} onPress={handleOnPress}>
-          {loading ? (
-            <ActivityIndicator size={35} color="#fff" />
-          ) : (
-            <Text style={styles.buttonText2}>ĐĂNG KÝ</Text>
-          )}
-        </TouchableOpacity>
-        <View>
-          <Text style={styles.error}>{status[0]}</Text>
-        </View>
-      </LinearGradient>
-    </View>
+    <SafeAreaView>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <LinearGradient colors={['#2B92E4', '#6FC7E1']} style={styles.login}>
+          <TouchableOpacity style={styles.titleView} onPress={() => navigation.goBack()}>
+            <Icon
+              name="keyboard-arrow-left"
+              style="material"
+              size={30}
+              onPress={() => navigation.goBack()}
+              color="white"
+            />
+            <Text style={styles.title}>Trở về</Text>
+          </TouchableOpacity>
+          <View style={styles.logo}>
+            <ImageBackground source={img} style={styles.image} />
+            <Text style={styles.logoText}>miracle</Text>
+          </View>
+          <TextInput
+            style={styles.input}
+            underlineColorAndroid="transparent"
+            placeholder="Tên đăng nhập"
+            placeholderTextColor="#666"
+            autoCapitalize="none"
+            value={userName}
+            onChangeText={(value) => setUserName(value)}
+          />
+          <TextInput
+            style={styles.input}
+            underlineColorAndroid="transparent"
+            placeholder="Tên hiển thị"
+            placeholderTextColor="#666"
+            autoCapitalize="none"
+            value={fullName}
+            onChangeText={(value) => setFullName(value)}
+          />
+          <TextInput
+            secureTextEntry={true}
+            style={styles.input}
+            underlineColorAndroid="transparent"
+            placeholder="Mật khẩu"
+            placeholderTextColor="#666"
+            autoCapitalize="none"
+            value={password}
+            onChangeText={(value) => setPassword(value)}
+          />
+          <TextInput
+            secureTextEntry={true}
+            style={styles.input}
+            underlineColorAndroid="transparent"
+            placeholder="Nhập lại mật khẩu"
+            placeholderTextColor="#666"
+            autoCapitalize="none"
+            value={confirmPassword}
+            onChangeText={(value) => setConfirmPassword(value)}
+          />
+          <RNPickerSelect
+            placeholder={{
+              label: 'Lựa chọn giới tính...',
+              value: null,
+            }}
+            style={pickerStyle}
+            onValueChange={(value) => {
+              setGender(value);
+            }}
+            value={gender}
+            items={[
+              { label: 'Nam', value: 1 },
+              { label: 'Nữ', value: 0 },
+            ]}
+          />
+          <TouchableOpacity style={styles.button2} onPress={handleOnPress}>
+            {loading ? (
+              <ActivityIndicator size={35} color="#fff" />
+            ) : (
+              <Text style={styles.buttonText2}>ĐĂNG KÝ</Text>
+            )}
+          </TouchableOpacity>
+          <Modal
+            animationType="slide"
+            visible={modelVisible}
+            transparent={true}
+            onRequestClose={() => {
+              setModelVisible(false);
+            }}
+          >
+            {errorModel()}
+          </Modal>
+        </LinearGradient>
+      </TouchableWithoutFeedback>
+    </SafeAreaView>
   );
 }
 
 //Style - Like CSS bro :)
 const styles = StyleSheet.create({
   error: {
-    marginTop: 10,
-    width: '100%',
-    textAlign: 'center',
-    color: '#F9476C',
-    fontSize: 17,
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  errorContainer: {
+    backgroundColor: 'white',
+    width: '50%',
+    borderRadius: 50,
+    position: 'absolute',
+    left: '25%',
+  },
+  errorText: {
+    fontSize: 20,
     fontWeight: '700',
+    color: 'red',
+    textAlign: 'center',
+    marginBottom: 20,
   },
   titleView: {
     position: 'absolute',

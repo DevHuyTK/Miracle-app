@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, Dimensions, TouchableOpacity, Image, Alert } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { connect } from 'react-redux';
+import { setImage } from './../store/Actions/ImageGridAction';
 
 const { width } = Dimensions.get('window');
 
-function ImagesGrid({ data }) {
+function ImagesGrid(props) {
   const countFrom = 5;
-  const [images, setImages] = useState(data);
-  const imagesToShow = [...images];
+  const imagesToShow = [...props.imageGrid];
 
-  if (countFrom && images.length > countFrom) {
+  if (countFrom && props.imageGrid.length > countFrom) {
     imagesToShow.length = countFrom;
   }
 
@@ -18,10 +19,10 @@ function ImagesGrid({ data }) {
   };
 
   const deleteHandle = (index) => {
-    // var delImage = images.splice(index, 1);
-    // var newImages = images.filter((item) => item !== delImage);
-    // setImages(newImages);
-    Alert.alert('Alert', 'image deleted');
+    var delImage = props.imageGrid.splice(index, 1);
+    var newImages = props.imageGrid.filter((item) => item !== delImage);
+    console.log(props.imageGrid);
+    props.setImageGrid(newImages);
   };
 
   const renderOne = () => {
@@ -31,10 +32,10 @@ function ImagesGrid({ data }) {
           style={[styles.imageContent, styles.imageContent1]}
           onPress={() => clickEventListener()}
         >
-          <Image style={styles.image} source={{ uri: images[0] }} />
+          <Image style={styles.image} source={{ uri: props.imageGrid[0] }} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.delButton} onPress={() => deleteHandle(0)}>
-          <Feather name="x-circle" color="white" size={width / 12} style={{ opacity: 0.5 }} />
+          <Feather name="x-circle" color="white" size={width / 12} style={{ opacity: 0.8 }} />
         </TouchableOpacity>
       </View>
     );
@@ -42,7 +43,7 @@ function ImagesGrid({ data }) {
 
   const renderTwo = () => {
     const conditionalRender =
-      [3, 4].includes(images.length) || (images.length > +countFrom && [3, 4].includes(+countFrom));
+      [3, 4].includes(props.imageGrid.length) || (props.imageGrid.length > +countFrom && [3, 4].includes(+countFrom));
 
     return (
       <View style={styles.row}>
@@ -53,14 +54,14 @@ function ImagesGrid({ data }) {
           >
             <Image
               style={styles.image}
-              source={{ uri: conditionalRender ? images[1] : images[0] }}
+              source={{ uri: conditionalRender ? props.imageGrid[1] : props.imageGrid[0] }}
             />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.delButton}
             onPress={() => deleteHandle(conditionalRender ? 1 : 0)}
           >
-            <Feather name="x-circle" color="white" size={width / 12} style={{ opacity: 0.5 }} />
+            <Feather name="x-circle" color="white" size={width / 12} style={{ opacity: 0.8 }} />
           </TouchableOpacity>
         </View>
         <View style={styles.imageContainer1}>
@@ -70,14 +71,14 @@ function ImagesGrid({ data }) {
           >
             <Image
               style={styles.image}
-              source={{ uri: conditionalRender ? images[2] : images[1] }}
+              source={{ uri: conditionalRender ? props.imageGrid[2] : props.imageGrid[1] }}
             />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.delButton}
             onPress={() => deleteHandle(conditionalRender ? 2 : 1)}
           >
-            <Feather name="x-circle" color="white" size={width / 12} style={{ opacity: 0.5 }} />
+            <Feather name="x-circle" color="white" size={width / 12} style={{ opacity: 0.8 }} />
           </TouchableOpacity>
         </View>
       </View>
@@ -91,24 +92,28 @@ function ImagesGrid({ data }) {
           style={[styles.imageContent, styles.imageContent1]}
           onPress={() => clickEventListener()}
         >
-          <Image style={styles.image} source={{ uri: images[images.length - 1] }} />
+          <Image style={styles.image} source={{ uri: props.imageGrid[props.imageGrid.length - 1] }} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.delButton} onPress={() => deleteHandle(images.length - 1)}>
-          <Feather name="x-circle" color="white" size={width / 12} style={{ opacity: 0.5 }} />
+        <TouchableOpacity style={styles.delButton} onPress={() => deleteHandle(props.imageGrid.length - 1)}>
+          <Feather name="x-circle" color="white" size={width / 12} style={{ opacity: 0.8 }} />
         </TouchableOpacity>
       </View>
     );
   };
 
   const renderCountOverlay = (more) => {
-    const extra = images.length - (countFrom && countFrom > 5 ? 5 : countFrom);
-    const conditionalRender = images.length == 4 || (images.length > +countFrom && +countFrom == 4);
+    const extra = props.imageGrid.length - (countFrom && countFrom > 5 ? 5 : countFrom);
+    const conditionalRender =
+    props.imageGrid.length == 4 || (props.imageGrid.length > +countFrom && +countFrom == 4);
     return (
       <TouchableOpacity
         style={[styles.imageContent, styles.imageContent2]}
         onPress={() => clickEventListener()}
       >
-        <Image style={styles.image} source={{ uri: conditionalRender ? images[3] : images[4] }} />
+        <Image
+          style={styles.image}
+          source={{ uri: conditionalRender ? props.imageGrid[3] : props.imageGrid[4] }}
+        />
         <View style={styles.overlayContent}>
           <View>
             <Text style={styles.count}>+{extra}</Text>
@@ -120,10 +125,11 @@ function ImagesGrid({ data }) {
 
   const renderThree = () => {
     const overlay =
-      !countFrom || countFrom > 5 || (images.length > countFrom && [4, 5].includes(+countFrom))
+      !countFrom || countFrom > 5 || (props.imageGrid.length > countFrom && [4, 5].includes(+countFrom))
         ? renderCountOverlay(true)
         : renderOverlay();
-    const conditionalRender = images.length == 4 || (images.length > +countFrom && +countFrom == 4);
+    const conditionalRender =
+    props.imageGrid.length == 4 || (props.imageGrid.length > +countFrom && +countFrom == 4);
 
     return (
       <View style={styles.row}>
@@ -134,14 +140,14 @@ function ImagesGrid({ data }) {
           >
             <Image
               style={styles.image}
-              source={{ uri: conditionalRender ? images[1] : images[2] }}
+              source={{ uri: conditionalRender ? props.imageGrid[1] : props.imageGrid[2] }}
             />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.delButton}
             onPress={() => deleteHandle(conditionalRender ? 1 : 2)}
           >
-            <Feather name="x-circle" color="white" size={width / 12} style={{ opacity: 0.5 }} />
+            <Feather name="x-circle" color="white" size={width / 12} style={{ opacity: 0.8 }} />
           </TouchableOpacity>
         </View>
         <View style={styles.imageContainer2}>
@@ -151,14 +157,14 @@ function ImagesGrid({ data }) {
           >
             <Image
               style={styles.image}
-              source={{ uri: conditionalRender ? images[2] : images[3] }}
+              source={{ uri: conditionalRender ? props.imageGrid[2] : props.imageGrid[3] }}
             />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.delButton}
             onPress={() => deleteHandle(conditionalRender ? 2 : 3)}
           >
-            <Feather name="x-circle" color="white" size={width / 12} style={{ opacity: 0.5 }} />
+            <Feather name="x-circle" color="white" size={width / 12} style={{ opacity: 0.8 }} />
           </TouchableOpacity>
         </View>
         {overlay}
@@ -174,6 +180,18 @@ function ImagesGrid({ data }) {
     </View>
   );
 }
+
+const mapStateToProps = (state) => ({
+  imageGrid: state.ImagesGridReducers,
+});
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    setImageGrid: (payload) => {
+      dispatch(setImage(payload));
+    }
+  };
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -235,4 +253,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ImagesGrid;
+export default connect(mapStateToProps, mapDispatchToProps)(ImagesGrid);
