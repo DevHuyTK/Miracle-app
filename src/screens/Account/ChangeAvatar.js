@@ -43,6 +43,8 @@ export default function ChangeAvatar({ navigation }) {
       quality: 1,
     });
 
+    console.log(result);
+
     if (!result.cancelled) {
       setPickedImagePath(result);
     }
@@ -80,7 +82,7 @@ export default function ChangeAvatar({ navigation }) {
   const data = new FormData();
   data.append('avatar', {
     name: pickedImagePath.uri?.split('/').pop(),
-    type: pickedImagePath.type,
+    type: 'image/jpg',
     uri: Platform.OS === 'ios' ? `file:///${pickedImagePath.uri}` : pickedImagePath.uri,
   });
 
@@ -139,7 +141,7 @@ export default function ChangeAvatar({ navigation }) {
           </View>
         </View>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity onPress={showImagePicker} style={styles.butonSelect}>
+          <TouchableOpacity onPress={() => showImagePicker()} style={styles.butonSelect}>
             <Text style={styles.buttonText}>Chọn ảnh</Text>
             <Icon
               name="keyboard-arrow-right"
@@ -149,7 +151,7 @@ export default function ChangeAvatar({ navigation }) {
             />
           </TouchableOpacity>
           <Divider width={1} />
-          <TouchableOpacity onPress={openCamera} style={styles.butonSelect}>
+          <TouchableOpacity onPress={() => openCamera()} style={styles.butonSelect}>
             <Text style={styles.buttonText}>Mở camera</Text>
             <Icon
               name="keyboard-arrow-right"

@@ -2,8 +2,10 @@ import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { ImageBrowser } from 'expo-image-picker-multiple';
+import { connect } from 'react-redux';
+import { setImage } from './../../store/Actions/ImageGridAction';
 
-export default function ImagePicker({ navigation, route }) {
+function ImagePicker({ navigation, route, ...props }) {
   const { userData } = route.params;
   const _getHeaderLoader = () => <ActivityIndicator size="small" color={'#0580FF'} />;
 
@@ -23,7 +25,9 @@ export default function ImagePicker({ navigation, route }) {
             type: 'image/jpg',
           });
         }
-        navigation.navigate('CreatePost', { photos: cPhotos, userData });
+        const arrImgs = cPhotos.map((item) => item.uri);
+        props.setImageGrid(arrImgs);
+        navigation.navigate('CreatePost', { userData });
       })
       .catch((e) => console.log(e));
   };
@@ -65,12 +69,12 @@ export default function ImagePicker({ navigation, route }) {
   return (
     <View style={[styles.flex, styles.container]}>
       <ImageBrowser
-        max={4}
-        onChange={(num, onSubmit)  => {
-            updateHandler(num, onSubmit);
+        max={10}
+        onChange={(num, onSubmit) => {
+          updateHandler(num, onSubmit);
         }}
         callback={(callback) => {
-            imagesCallback(callback)
+          imagesCallback(callback);
         }}
         renderSelectedComponent={(num) => renderSelectedComponent(num)}
         emptyStayComponent={emptyStayComponent}
@@ -78,6 +82,17 @@ export default function ImagePicker({ navigation, route }) {
     </View>
   );
 }
+const mapStateToProps = (state) => ({
+  imageGrid: state.ImagesGridReducers,
+});
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    setImageGrid: (payload) => {
+      dispatch(setImage(payload));
+    }
+  };
+};
 
 const styles = StyleSheet.create({
   topPostButton: {
@@ -85,8 +100,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 10,
     fontWeight: 'bold',
-    marginRight:10,
-    fontSize:16
+    marginRight: 10,
+    fontSize: 16,
+    color: '#fff',
   },
   flex: {
     flex: 1,
@@ -114,3 +130,5 @@ const styles = StyleSheet.create({
     color: '#ffffff',
   },
 });
+
+export default connect(mapStateToProps, mapDispatchToProps)(ImagePicker);

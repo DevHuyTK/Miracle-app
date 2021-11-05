@@ -23,39 +23,25 @@ import { setImage } from './../../store/Actions/ImageGridAction';
 const { width } = Dimensions.get('window');
 
 function CreatePost({ navigation, route, ...props }) {
-  const { userData, photos } = route.params;
-  const [imgs, setImgs] = useState([]);
+  const { userData } = route.params;
   const [title, setTitle] = useState('');
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState('');
   const [errorText, setErrorText] = useState('');
 
-  if (photos) setImgs(photos);
-  delete route.params.photos;
-
-  const arrImgs = Object.assign({}, ...imgs);
-
-  const images = [
-    'https://i.imgur.com/UYiroysl.jpg',
-    'https://i.imgur.com/UPrs1EWl.jpg',
-    'https://i.imgur.com/MABUbpDl.jpg',
-    'https://i.imgur.com/KZsmUi2l.jpg',
-    'https://i.imgur.com/2nCt3Sbl.jpg',
-    'https://i.imgur.com/UYiroysl.jpg',
-    'https://i.imgur.com/UPrs1EWl.jpg',
-  ];
-
   const createFormData = (imageFile, title) => {
-    const arrImgs = Object.assign({}, ...imageFile);
+    console.log(imageFile);
     const data = new FormData();
     data.append('title', {
       title,
     });
-    data.append('photos', {
-      name: arrImgs.name,
-      type: arrImgs.type,
-      uri: Platform.OS === 'ios' ? arrImgs.uri.replace('file://', '') : arrImgs.uri,
-    });
+    for (let i = 0; i < imageFile.length; i++) {
+      data.append('photos', {
+        name: imageFile[i]?.split('/').pop(),
+        type: 'image/jpg',
+        uri: Platform.OS === 'ios' ? imageFile[i].replace('file://', '') : imageFile[i],
+      });
+    }
 
     console.log(data);
     return data;
@@ -71,7 +57,7 @@ function CreatePost({ navigation, route, ...props }) {
         'Content-Type': 'multipart/form-data',
         Authorization: 'Bearer ' + token,
       },
-      body: createFormData(imgs, title),
+      body: createFormData(props.imageGrid, title),
     })
       .then((response) => response.json())
       .then(async (res) => {
@@ -101,8 +87,12 @@ function CreatePost({ navigation, route, ...props }) {
             <Text style={styles.leftText}>Tạo bài viết</Text>
           </View>
           <View style={styles.right}>
-            <TouchableOpacity style={styles.topPostButton}>
-              <Text style={styles.topPostText}>Đăng</Text>
+            <TouchableOpacity style={styles.topPostButton} onPress={() => handleUploadAvatar()}>
+              {loading ? (
+                <ActivityIndicator size={35} color="#fff" />
+              ) : (
+                <Text style={styles.topPostText}>Đăng</Text>
+              )}
             </TouchableOpacity>
           </View>
         </View>
@@ -135,14 +125,6 @@ function CreatePost({ navigation, route, ...props }) {
           value={title}
           onChangeText={(text) => setTitle(text)}
         />
-        {/* <ImagesGrid data={arrImgs.uri} /> */}
-        {/* <View style={styles.imageContainer}>
-          {imgs?.map((item, index) => (
-            <Image key={index} source={{ uri: item.uri }} style={styles.image} />
-          ))}
-        </View>
-          onChangeText={(value) => setText(value)}
-        /> */}
         <ImagesGrid />
         <TouchableOpacity
           style={styles.photoButton}
