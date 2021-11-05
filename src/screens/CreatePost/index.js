@@ -14,29 +14,25 @@ import { FontAwesome } from '@expo/vector-icons';
 import { Avatar, Icon } from 'react-native-elements';
 import ImagesGrid from '../../Components/ImageGrid';
 import { DOMAIN } from '../../store/constant';
+import { connect } from 'react-redux';
+import { setImage } from './../../store/Actions/ImageGridAction';
 
 const { width } = Dimensions.get('window');
 
-function CreatePost({ navigation, route }) {
+function CreatePost({ navigation, route, ...props }) {
   const { userData, photos } = route.params;
-  const [imgs, setImgs] = useState([]);
+  const [text, setText] = useState('');
 
   useEffect(() => {
-    if (photos) setImgs(photos);
+    if (photos) {
+      var newImages = photos.map((newImage, index) => {
+        return newImage.uri;
+      });
+      props.setImageGrid(newImages);
+    }
     delete route.params.photos;
   }, [photos]);
 
-  const arrImgs = Object.assign({}, ...imgs)
-
-  const images = [
-    'https://i.imgur.com/UYiroysl.jpg',
-    'https://i.imgur.com/UPrs1EWl.jpg',
-    'https://i.imgur.com/MABUbpDl.jpg',
-    'https://i.imgur.com/KZsmUi2l.jpg',
-    'https://i.imgur.com/2nCt3Sbl.jpg',
-    'https://i.imgur.com/UYiroysl.jpg',
-    'https://i.imgur.com/UPrs1EWl.jpg',
-  ];
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <ScrollView style={styles.container}>
@@ -82,8 +78,9 @@ function CreatePost({ navigation, route }) {
           scrollEnabled={true}
           placeholder="Bạn đang nghĩ gì vậy?"
           style={styles.input}
+          onChangeText={(value) => setText(value)}
         />
-        <ImagesGrid data={arrImgs.uri} />
+        <ImagesGrid />
         <TouchableOpacity
           style={styles.photoButton}
           onPress={() => navigation.navigate('ImagePicker')}
@@ -100,6 +97,18 @@ function CreatePost({ navigation, route }) {
     </TouchableWithoutFeedback>
   );
 }
+
+const mapStateToProps = (state) => ({
+  imageGrid: state.ImagesGridReducers,
+});
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    setImageGrid: (payload) => {
+      dispatch(setImage(payload));
+    },
+  };
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -189,4 +198,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreatePost;
+export default connect(mapStateToProps, mapDispatchToProps)(CreatePost);
