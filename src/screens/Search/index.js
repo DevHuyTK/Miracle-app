@@ -58,7 +58,7 @@ function Search({ navigation }) {
       });
   }, []);
 
-  searchFunction = (text) => {
+  const searchFunction = (text) => {
     let e = text.trim().toLowerCase();
     let filteredName = datas.filter((item) => item.full_name.toLowerCase().match(e));
     if (!e || e === '') {
@@ -73,7 +73,7 @@ function Search({ navigation }) {
     }
   };
 
-  renderHeader = () => {
+  const renderHeader = () => {
     return (
       <SafeAreaView style={{ flexDirection: 'row', backgroundColor: '#fff' }}>
         <View style={{ width: '15%', justifyContent: 'center', alignItems: 'center' }}>

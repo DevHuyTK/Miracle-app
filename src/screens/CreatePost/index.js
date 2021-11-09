@@ -19,6 +19,8 @@ import { DOMAIN } from '../../store/constant';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { connect } from 'react-redux';
 import { setImage } from './../../store/Actions/ImageGridAction';
+import { getAccountNewFeed } from './../../store/Actions/AccountActions';
+import mime from 'mime';
 
 const { width } = Dimensions.get('window');
 
@@ -29,23 +31,18 @@ function CreatePost({ navigation, route, ...props }) {
   const [status, setStatus] = useState('');
   const [errorText, setErrorText] = useState('');
 
-  const createFormData = (imageFile, title) => {
-    console.log(imageFile);
-    const data = new FormData();
-    data.append('title', {
-      title,
+  const data = new FormData();
+  [...props.imageGrid].forEach((image) => {
+    const newImageUri = 'file:///' + image.split('file:/').join('');
+    data.append('photos', {
+      name: image.split('/').pop(),
+      type: mime.getType(newImageUri),
+      uri: newImageUri,
     });
-    for (let i = 0; i < imageFile.length; i++) {
-      data.append('photos', {
-        name: imageFile[i]?.split('/').pop(),
-        type: 'image/jpg',
-        uri: Platform.OS === 'ios' ? imageFile[i].replace('file://', '') : imageFile[i],
-      });
-    }
-
-    console.log(data);
-    return data;
-  };
+  });
+  // data.append('title', {
+  //   title,
+  // });
 
   const handleUploadAvatar = async () => {
     setLoading(true);
@@ -57,17 +54,18 @@ function CreatePost({ navigation, route, ...props }) {
         'Content-Type': 'multipart/form-data',
         Authorization: 'Bearer ' + token,
       },
-      body: createFormData(props.imageGrid, title),
+      body: data,
     })
       .then((response) => response.json())
-      .then(async (res) => {
+      .then((res) => {
         if (res.status === 1) {
+          console.log(res.message);
           setStatus(res.message);
-          setTimeout(() => {
-            navigation.navigate('Community');
-          }, 1000);
+          navigation.navigate('Community');
+          props.getNewFeed();
           setLoading(false);
         } else {
+          console.log(res.message);
           setErrorText(res.message);
           setLoading(false);
         }
@@ -149,12 +147,16 @@ function CreatePost({ navigation, route, ...props }) {
 
 const mapStateToProps = (state) => ({
   imageGrid: state.ImagesGridReducers,
+  newfeed: state.account.newfeed,
 });
 
 const mapDispatchToProps = (dispatch) => {
   return {
     setImageGrid: (payload) => {
       dispatch(setImage(payload));
+    },
+    getNewFeed: (payload) => {
+      dispatch(getAccountNewFeed(payload));
     },
   };
 };

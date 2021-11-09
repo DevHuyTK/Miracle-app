@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 
-export const ChangeDataContext = React.createContext()
+export const ChangeDataContext = React.createContext();
 
 export function ChangeDataProvider(props) {
-  const [isChanged, setIsChanged] = useState(false)
+  const [isChanged, setIsChanged] = useState(false);
 
   return (
     <ChangeDataContext.Provider
@@ -14,5 +14,5 @@ export function ChangeDataProvider(props) {
     >
       {props.children}
     </ChangeDataContext.Provider>
-  )
+  );
 }

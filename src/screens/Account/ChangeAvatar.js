@@ -16,6 +16,7 @@ import { DOMAIN } from '../../store/constant';
 import { ChangeDataContext } from '../../contexts/ChangeData';
 import { Icon } from 'react-native-elements';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import mime from 'mime';
 
 const { width } = Dimensions.get('window');
 
@@ -43,8 +44,6 @@ export default function ChangeAvatar({ navigation }) {
       quality: 1,
     });
 
-    console.log(result);
-
     if (!result.cancelled) {
       setPickedImagePath(result);
     }
@@ -67,24 +66,20 @@ export default function ChangeAvatar({ navigation }) {
       quality: 1,
     });
 
-    console.log(result);
-
     if (!result.cancelled) {
       setPickedImagePath(result);
     }
   };
 
-  //spile one string after the last '/'
-  // const getFileName = (path) => {
-  //   return path?.split('/').pop();
-  // };
+  const newImageUri = 'file:///' + pickedImagePath.uri?.split('file:/').join('');
 
   const data = new FormData();
   data.append('avatar', {
     name: pickedImagePath.uri?.split('/').pop(),
-    type: 'image/jpg',
-    uri: Platform.OS === 'ios' ? `file:///${pickedImagePath.uri}` : pickedImagePath.uri,
+    type: mime.getType(newImageUri),
+    uri: newImageUri,
   });
+  console.log(data);
 
   const handleUploadAvatar = async () => {
     setLoading(true);
@@ -102,9 +97,7 @@ export default function ChangeAvatar({ navigation }) {
         if (res.status === 1) {
           setStatus(res.message);
           setIsChanged(!isChanged);
-          setTimeout(() => {
-            navigation.navigate('Account');
-          }, 1000);
+          navigation.navigate('Account');
           setLoading(false);
         } else {
           setErrorText(res.message);
