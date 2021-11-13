@@ -25,6 +25,8 @@ function Account({ navigation }) {
       .catch((error) => console.log(error));
   }, [isChanged]);
 
+  console.log(isChanged);
+
   const setting = [
     {
       icon: 'settings',

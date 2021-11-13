@@ -66,7 +66,7 @@ function SearchChat(props) {
       });
   };
 
-  searchFunction = (text) => {
+  const searchFunction = (text) => {
     let e = text.trim().toLowerCase();
     let filteredName = datas.filter((item) => item.full_name.toLowerCase().match(e));
     if (!e || e === '') {
@@ -88,7 +88,7 @@ function SearchChat(props) {
     );
   }
 
-  renderHeader = () => {
+  const renderHeader = () => {
     return (
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <ScrollView style={styles.container}>

@@ -11,7 +11,9 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
+  Modal,
 } from 'react-native';
+import { useBackHandler } from '@react-native-community/hooks';
 import { FontAwesome } from '@expo/vector-icons';
 import { Avatar, Icon } from 'react-native-elements';
 import ImagesGrid from '../../Components/ImageGrid';
@@ -19,6 +21,8 @@ import { DOMAIN } from '../../store/constant';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { connect } from 'react-redux';
 import { setImage } from './../../store/Actions/ImageGridAction';
+import { getAccountNewFeed } from './../../store/Actions/AccountActions';
+import mime from 'mime';
 
 const { width } = Dimensions.get('window');
 
@@ -28,24 +32,67 @@ function CreatePost({ navigation, route, ...props }) {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState('');
   const [errorText, setErrorText] = useState('');
+  const [modelVisible, setModelVisible] = useState(false);
 
-  const createFormData = (imageFile, title) => {
-    console.log(imageFile);
-    const data = new FormData();
-    data.append('title', {
-      title,
-    });
-    for (let i = 0; i < imageFile.length; i++) {
-      data.append('photos', {
-        name: imageFile[i]?.split('/').pop(),
-        type: 'image/jpg',
-        uri: Platform.OS === 'ios' ? imageFile[i].replace('file://', '') : imageFile[i],
-      });
-    }
-
-    console.log(data);
-    return data;
+  const errorModel = () => {
+    return (
+      <>
+        <TouchableOpacity style={styles.error} onPress={() => setModelVisible(false)}>
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>Bạn muốn hoàn thành bài viết của mình sau?</Text>
+            <Text style={{ fontSize: 14, color: 'lightgray', marginLeft: 10, marginBottom: 20 }}>
+              Bỏ bài viết hoặc tiếp tục chỉnh sửa.
+            </Text>
+            <TouchableOpacity
+              style={styles.errorButton}
+              onPress={() => {
+                props.setImageGrid([]);
+                setModelVisible(false);
+                navigation.goBack();
+              }}
+            >
+              <FontAwesome name="trash" style="font-awesome-5" size={30} />
+              <Text style={{ fontSize: 16, color: '#000', marginLeft: 10 }}>Bỏ bài viết</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.errorButton} onPress={() => setModelVisible(false)}>
+              <Icon name="check" style="font-awesome-5" size={30} color="#2abada" />
+              <Text style={{ fontSize: 16, color: '#2abada', marginLeft: 10 }}>
+                Tiếp tục chỉnh sửa
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </>
+    );
   };
+
+  //check array is empty
+  const checkArray = props.imageGrid.length;
+
+  const handledGoBack = () => {
+    if (title !== '' || checkArray !== 0) setModelVisible(true);
+    else navigation.goBack();
+  };
+
+  //Checking user goBack with back button in mobile phone
+  useBackHandler(() => {
+    if (title !== '' || checkArray !== 0) {
+      setModelVisible(true);
+      return true;
+    }
+    return false;
+  });
+
+  const data = new FormData();
+  [...props.imageGrid].forEach((image) => {
+    const newImageUri = 'file:///' + image.split('file:/').join('');
+    data.append('photos', {
+      name: image.split('/').pop(),
+      type: mime.getType(newImageUri),
+      uri: newImageUri,
+    });
+  });
+  data.append('title', title);
 
   const handleUploadAvatar = async () => {
     setLoading(true);
@@ -57,15 +104,14 @@ function CreatePost({ navigation, route, ...props }) {
         'Content-Type': 'multipart/form-data',
         Authorization: 'Bearer ' + token,
       },
-      body: createFormData(props.imageGrid, title),
+      body: data,
     })
       .then((response) => response.json())
-      .then(async (res) => {
+      .then((res) => {
         if (res.status === 1) {
           setStatus(res.message);
-          setTimeout(() => {
-            navigation.navigate('Community');
-          }, 1000);
+          navigation.navigate('Community');
+          props.getNewFeed();
           setLoading(false);
         } else {
           setErrorText(res.message);
@@ -73,6 +119,7 @@ function CreatePost({ navigation, route, ...props }) {
         }
       });
   };
+
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <ScrollView style={styles.container}>
@@ -82,7 +129,9 @@ function CreatePost({ navigation, route, ...props }) {
               name="keyboard-backspace"
               style="material"
               size={30}
-              onPress={() => navigation.goBack()}
+              onPress={() => {
+                handledGoBack();
+              }}
             />
             <Text style={styles.leftText}>Tạo bài viết</Text>
           </View>
@@ -142,6 +191,16 @@ function CreatePost({ navigation, route, ...props }) {
             )}
           </TouchableOpacity>
         </View>
+        <Modal
+          animationType="none"
+          visible={modelVisible}
+          transparent={true}
+          onRequestClose={() => {
+            setModelVisible(false);
+          }}
+        >
+          {errorModel()}
+        </Modal>
       </ScrollView>
     </TouchableWithoutFeedback>
   );
@@ -149,6 +208,7 @@ function CreatePost({ navigation, route, ...props }) {
 
 const mapStateToProps = (state) => ({
   imageGrid: state.ImagesGridReducers,
+  newfeed: state.account.newfeed,
 });
 
 const mapDispatchToProps = (dispatch) => {
@@ -156,10 +216,36 @@ const mapDispatchToProps = (dispatch) => {
     setImageGrid: (payload) => {
       dispatch(setImage(payload));
     },
+    getNewFeed: (payload) => {
+      dispatch(getAccountNewFeed(payload));
+    },
   };
 };
 
 const styles = StyleSheet.create({
+  error: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.2)',
+    justifyContent: 'flex-end',
+  },
+  errorContainer: {
+    padding: 10,
+    backgroundColor: 'white',
+    width: '100%',
+    flexDirection: 'column',
+  },
+  errorText: {
+    fontSize: 16,
+    fontWeight: '400',
+    color: '#000',
+    marginLeft: 10,
+    paddingTop: 10,
+  },
+  errorButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+  },
   container: {
     flex: 1,
     backgroundColor: '#fff',
