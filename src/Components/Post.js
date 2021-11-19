@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import { Avatar, Icon } from 'react-native-elements';
 import ImageComp from './ImageComp';
@@ -12,6 +12,18 @@ export default function Post({ post, onNavigation, userData, token }) {
   const [isLiked, setIsLike] = useState(false);
   const [likesCount, setLikesCount] = useState(post.like_count?.length);
   const socket = socketIOClient(DOMAIN);
+
+  useEffect(() => {
+    userIsLike();
+  }, []);
+
+  const userIsLike = async () => {
+    if (post.like_count.find((item) => item.user_id.toString() == userData._id)) {
+      return setIsLike(true);
+    } else {
+      return setIsLike(false);
+    }
+  };
 
   const handleLike = async (post) => {
     socket.emit('like-post', {
@@ -63,7 +75,6 @@ export default function Post({ post, onNavigation, userData, token }) {
         });
       });
   };
-  
 
   return (
     <View style={{ marginVertical: 10, backgroundColor: '#fff', width: width }}>

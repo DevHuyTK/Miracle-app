@@ -19,7 +19,6 @@ import ChangePassword from '../screens/Account/ChangePassword';
 import ChangeAvatar from '../screens/Account/ChangeAvatar';
 import AvatarScreen from '../screens/Account/AvatarScreen';
 import YourScreen from '../screens/Account/YourScreen';
-import { ChangeDataProvider } from '../contexts/ChangeData';
 
 const Stack = createStackNavigator();
 
@@ -70,31 +69,29 @@ function Home() {
 
 export default function Navigation() {
   return (
-    <ChangeDataProvider>
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="Login" component={Login} />
-          <Stack.Screen name="Signup2" component={Signup2} />
-          <Stack.Screen name="Home" component={Home} />
-          <Stack.Screen name="Search" component={Search} />
-          <Stack.Screen name="AccDetail" component={AccountDetails} />
-          <Stack.Screen name="CreatePost" component={CreatePost} />
-          <Stack.Screen
-            name="ImagePicker"
-            component={ImagePicker}
-            options={{
-              headerShown: true,
-              title: 'Đã chọn 0',
-            }}
-          />
-          <Stack.Screen name="ChangePassword" component={ChangePassword} />
-          <Stack.Screen name="ChangeAvatar" component={ChangeAvatar} />
-          <Stack.Screen name="Avatar" component={AvatarScreen} />
-          <Stack.Screen name="YourScreen" component={YourScreen} />
-          <Stack.Screen name="ChatBox" component={ChatBox} />
-          <Stack.Screen name="SearchChat" component={SearchChat} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </ChangeDataProvider>
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="Signup2" component={Signup2} />
+        <Stack.Screen name="Home" component={Home} />
+        <Stack.Screen name="Search" component={Search} />
+        <Stack.Screen name="AccDetail" component={AccountDetails} />
+        <Stack.Screen name="CreatePost" component={CreatePost} />
+        <Stack.Screen
+          name="ImagePicker"
+          component={ImagePicker}
+          options={{
+            headerShown: true,
+            title: 'Đã chọn 0',
+          }}
+        />
+        <Stack.Screen name="ChangePassword" component={ChangePassword} />
+        <Stack.Screen name="ChangeAvatar" component={ChangeAvatar} />
+        <Stack.Screen name="Avatar" component={AvatarScreen} />
+        <Stack.Screen name="YourScreen" component={YourScreen} />
+        <Stack.Screen name="ChatBox" component={ChatBox} />
+        <Stack.Screen name="SearchChat" component={SearchChat} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
