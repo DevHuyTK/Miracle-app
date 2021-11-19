@@ -16,43 +16,45 @@ const ChatBox = ({ navigation, route }) => {
   // const { setMatchingList } = useContext(MatchingListContext)
 
   useEffect(() => {
+    setChatList(chat);
+  }, [!chat]);
+
+  useEffect(() => {
     socket.emit('join', {
       token: token,
-      userIds: [data._id],
+      userIds: [data.user_id || data._id],
     });
     socket.emit('seen-message', {
       token: token,
-      userId: data._id,
+      userId: data.user_id || data._id,
     });
     socket.on('seen-message-response', (data) => {
-      console.log('a')
-    })
+      // console.log('a');
+    });
     socket.on('send-message-response', (data) => {
-      console.log(data)
-      console.log('send-message-response');
+      // console.log(data);
+      // console.log('send-message-response');
       setMessage('');
       setLoading(false);
       setChatList((prevState) => [...prevState, data.data]);
     });
   }, []);
 
-  console.log(chatList);
-
   const handleOnPress = () => {
     setLoading(true);
     socket.emit('join', {
       token: token,
-      userIds: [data._id],
+      userIds: [data.user_id],
     });
     socket.emit('send-message', {
       token: token,
-      userId: data._id,
+      userId: data.user_id,
       message: message,
     });
   };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{ flex: 1 }}>
       <View
         style={{
           backgroundColor: '#fff',
@@ -68,29 +70,28 @@ const ChatBox = ({ navigation, route }) => {
           name={data?.full_name}
         />
         <FlatList
+          data={chatList}
           style={styles.chatBox}
           ref={scrollView}
           onContentSizeChange={() => scrollView.current.scrollToEnd({ animated: true })}
-          keyExtractor={chatList.message}
-        >
-          <View style={{ paddingBottom: 20 }}>
-            {chatList?.map((item, index) => {
-              const isUserSending = item.user_post._id === user._id;
-              return (
-                <View key={index} style={styles.chat}>
+          keyExtractor={(item) => item?._id}
+          renderItem={({ item, key }) => {
+            const isUserSending = item?.user_id === user._id;
+            return (
+              <View key={key} style={{ paddingBottom: 20 }}>
+                <View style={styles.chat}>
                   <Text style={isUserSending ? styles.chatRight : styles.chatLeft}>
-                    {item.message}
-                    {console.log(item.message)}
+                    {item?.message}
                   </Text>
                 </View>
-              );
-            })}
-          </View>
-        </FlatList>
+              </View>
+            );
+          }}
+        />
         <ChatInput
           loading={loading}
           message={message}
-          onPress={handleOnPress}
+          onPress={() => handleOnPress()}
           onChange={(value) => setMessage(value)}
         />
       </View>

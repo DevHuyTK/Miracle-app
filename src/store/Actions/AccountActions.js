@@ -18,4 +18,10 @@ export function getAllAccount(payload) {
     payload,
   };
 }
+export function getMatchingListAccount(payload) {
+  return {
+    type: types.GET_MATCHING_LIST_REQUEST,
+    payload,
+  };
+}
 

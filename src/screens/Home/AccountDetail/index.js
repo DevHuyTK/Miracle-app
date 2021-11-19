@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -12,9 +12,9 @@ import {
 import { Avatar, ListItem, Icon, Button } from 'react-native-elements';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DOMAIN } from '../../../store/constant';
-import { ChangeDataContext } from '../../../contexts/ChangeData';
-import { getStatusBarHeight } from 'react-native-status-bar-height';
+import { connect } from 'react-redux';
 import RNPickerSelect from 'react-native-picker-select';
+import { getMatchingListAccount } from '../../../store/Actions/AccountActions';
 
 const { width } = Dimensions.get('window');
 
@@ -40,8 +40,7 @@ const pickerStyle = {
   },
 };
 //This's what u see (_ _")
-function accDetail({ navigation }) {
-  const { isChanged, setIsChanged } = useContext(ChangeDataContext);
+function accDetail({ navigation, ...props }) {
   const [address, setAddress] = useState('');
   const [email, setEmail] = useState('');
   const [gender, setGender] = useState('');
@@ -53,26 +52,14 @@ function accDetail({ navigation }) {
   const [status, setStatus] = useState('');
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const jsonValue = await AsyncStorage.getItem('user');
-        return jsonValue != null ? JSON.parse(jsonValue) : null;
-      } catch (e) {
-        console.log(e);
-      }
-    }
-    fetchData()
-      .then((data) => {
-        setAddress(data.address),
-        setPhone(data.phone),
-        setEmail(data.email),
-        setGender(data.gender),
-        setAge(data.age),
-        setFullName(data.full_name);
-        setDescription(data.description);
-      })
-      .catch((error) => console.log(error));
-  }, [isChanged]);
+    setAddress(props.user_info.address),
+      setPhone(props.user_info.phone),
+      setEmail(props.user_info.email),
+      setGender(props.user_info.gender),
+      setAge(props.user_info.age),
+      setFullName(props.user_info.full_name);
+    setDescription(props.user_info.description);
+  }, []);
 
   const handleUpdateInfo = async () => {
     setLoading(true);
@@ -97,7 +84,7 @@ function accDetail({ navigation }) {
       .then((response) => response.json())
       .then(async (res) => {
         if (res.status === 1) {
-          await AsyncStorage.setItem('user', JSON.stringify(res.data));
+          await props.getMatchingList(token)
           await navigation.navigate('Account');
           setLoading(false);
           setIsChanged(!isChanged);
@@ -313,6 +300,15 @@ function accDetail({ navigation }) {
     </ScrollView>
   );
 }
+const mapStateToProps = (state) => ({
+  user_info: state.account.user_info,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  getMatchingList: (data) => {
+    dispatch(getMatchingListAccount(data));
+  },
+});
 
 //Style - Like CSS bro :)
 const styles = StyleSheet.create({
@@ -480,4 +476,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default accDetail;
+export default connect(mapStateToProps, mapDispatchToProps)(accDetail);

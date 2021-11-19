@@ -1,27 +1,62 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Avatar, Icon } from 'react-native-elements';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import socketIOClient from 'socket.io-client';
 import { DOMAIN } from '../../store/constant';
+import { connect } from 'react-redux';
+import { getMatchingListAccount } from '../../store/Actions/AccountActions';
 
-export default function YourHeaderInfo({ navigation, token, userData, posts, user }) {
+function YourHeaderInfo({ navigation, token, userData, posts, ...props }) {
+  const [isValid, setIsValid] = useState(false);
   const socket = socketIOClient(DOMAIN);
-  
+
   const userFollow = userData?.follower_list?.length;
   const userFollowing = userData?.following_list?.length;
+
+  useEffect(() => {
+    userFollowIsValid();
+  }, []);
+
+  const userFollowIsValid = async () => {
+    if (props.user_info?.following_list.find((item) => item.user_id.toString() == userData._id)) {
+      return setIsValid(true);
+    } else {
+      return setIsValid(false);
+    }
+  };
+
+  const onFollowPressed = (user) => {
+    if (isValid === true) {
+      handleUnFollow(user);
+    } else {
+      handleFollow(user);
+    }
+    setIsValid(!isValid);
+    props.getMatchingList(token);
+  };
 
   const handleFollow = async (user) => {
     socket.emit('follow-user', {
       token: token,
       userId: user._id,
     });
-    socket.on('follow-user-response', (user) => {
-      console.log(user, 'a');
-      // setMatchingList(user.user)
-    });
+    // socket.on('follow-user-response', (user) => {
+    //   console.log(user, 'a');
+    // });
   };
+  const handleUnFollow = async (user) => {
+    socket.emit('unfollow-user', {
+      token: token,
+      userId: user._id,
+    });
+    // socket.on('unfollow-user-response', (user) => {
+    //   console.log(user, 'a');
+    // });
+  };
+  
+
   const handleOnPress = async (item) => {
-    fetch(`${DOMAIN}/api/chat?userId=${item._id}`, {
+    fetch(`${DOMAIN}/api/chat/${item.user_id}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -37,10 +72,11 @@ export default function YourHeaderInfo({ navigation, token, userData, posts, use
           data: item,
           token,
           chat: res.data,
-          user,
+          user: props.user_info,
         });
       });
   };
+
   return (
     <View>
       <View style={styles.header}>
@@ -94,7 +130,7 @@ export default function YourHeaderInfo({ navigation, token, userData, posts, use
           </View>
           <View style={{ flexDirection: 'row', paddingTop: 10, paddingHorizontal: 10 }}>
             <TouchableOpacity
-              onPress={() => handleFollow(userData)}
+              onPress={() => onFollowPressed(userData)}
               style={{
                 flex: 1,
                 marginLeft: 10,
@@ -106,11 +142,7 @@ export default function YourHeaderInfo({ navigation, token, userData, posts, use
                 borderRadius: 6,
               }}
             >
-              {user?.following_list.find((item) => item.user_id.toString() == userData._id) ? (
-                <Text>Hủy theo dõi</Text>
-              ) : (
-                <Text>Theo dõi</Text>
-              )}
+              <Text>{isValid ? 'Hủy theo dõi' : 'Theo dõi'}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => handleOnPress(userData)}
@@ -157,3 +189,18 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
 });
+const mapStateToProps = (state) => {
+  return {
+    user_info: state.account.user_info,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    getMatchingList: (data) => {
+      dispatch(getMatchingListAccount(data));
+    },
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(YourHeaderInfo);

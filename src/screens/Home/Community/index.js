@@ -1,30 +1,24 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, FlatList, SafeAreaView } from 'react-native';
 import Post from '../../../Components/Post';
 import Header from '../../../Components/Header';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ChangeDataContext } from '../../../contexts/ChangeData';
 import { connect } from 'react-redux';
 import Newfeeds from '../../../Components/Newfeeds';
 import LottieView from 'lottie-react-native';
+import { getAccountUserNewFeed, getAccountNewFeed } from '../../../store/Actions/AccountActions';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function Community({ navigation, ...props }) {
-  const [loginData, setLoginData] = useState({});
-  const { isChanged, setIsChanged } = useContext(ChangeDataContext);
-
+  const [token, setToken] = useState('');
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const jsonValue = await AsyncStorage.getItem('user');
-        return jsonValue != null ? JSON.parse(jsonValue) : null;
-      } catch (e) {
-        console.log(e);
-      }
+    async function getUserInfo() {
+      const token = await AsyncStorage.getItem('token');
+      setToken(token);
+      props.getUserNewFeed(token);
+      props.getNewFeed(token);
     }
-    fetchData()
-      .then((data) => setLoginData(data))
-      .catch((error) => console.log(error));
-  }, [!isChanged]);
+    getUserInfo();
+  }, []);
 
   return (
     <View style={{ flex: 1 }}>
@@ -32,13 +26,13 @@ function Community({ navigation, ...props }) {
       <SafeAreaView style={{ flex: 2 }}>
         {props?.newfeed ? (
           <FlatList
-            data={Object.values(props.newfeed)}
+            data={props.newfeed}
             keyExtractor={(item) => item._id}
             renderItem={({ item }) => (
-              <Post onNavigation={navigation} post={item} userData={loginData} />
+              <Post onNavigation={navigation} post={item} userData={props?.user_info} token={token} />
             )}
             showsVerticalScrollIndicator={false}
-            ListHeaderComponent={<Newfeeds onNavigation={navigation} userData={loginData} />}
+            ListHeaderComponent={<Newfeeds onNavigation={navigation} userData={props?.user_info} />}
           />
         ) : (
           <LottieView
@@ -59,6 +53,16 @@ function Community({ navigation, ...props }) {
 
 const mapStateToProps = (state) => ({
   newfeed: state.account.newfeed,
+  user_info: state.account.user_info,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  getUserNewFeed: (data) => {
+    dispatch(getAccountUserNewFeed(data));
+  },
+  getNewFeed: (data) => {
+    dispatch(getAccountNewFeed(data));
+  },
 });
 
 const styles = StyleSheet.create({
@@ -144,4 +148,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default connect(mapStateToProps)(Community);
+export default connect(mapStateToProps, mapDispatchToProps)(Community);

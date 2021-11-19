@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -13,19 +13,19 @@ import * as ImagePicker from 'expo-image-picker';
 import { Divider } from 'react-native-elements';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DOMAIN } from '../../store/constant';
-import { ChangeDataContext } from '../../contexts/ChangeData';
 import { Icon } from 'react-native-elements';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import mime from 'mime';
+import { getMatchingListAccount } from '../../store/Actions/AccountActions';
+import { connect } from 'react-redux';
 
 const { width } = Dimensions.get('window');
 
-export default function ChangeAvatar({ navigation }) {
+function ChangeAvatar({ navigation, ...props }) {
   const [pickedImagePath, setPickedImagePath] = useState('');
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState('');
   const [errorText, setErrorText] = useState('');
-  const { isChanged, setIsChanged } = useContext(ChangeDataContext);
 
   // This function is triggered when the "Select an image" button pressed
   const showImagePicker = async () => {
@@ -79,7 +79,6 @@ export default function ChangeAvatar({ navigation }) {
     type: mime.getType(newImageUri),
     uri: newImageUri,
   });
-  console.log(data);
 
   const handleUploadAvatar = async () => {
     setLoading(true);
@@ -93,10 +92,10 @@ export default function ChangeAvatar({ navigation }) {
       body: data,
     })
       .then((response) => response.json())
-      .then((res) => {
+      .then(async (res) => {
         if (res.status === 1) {
+          await props.getMatchingList(token);
           setStatus(res.message);
-          setIsChanged(!isChanged);
           navigation.navigate('Account');
           setLoading(false);
         } else {
@@ -232,3 +231,19 @@ const styles = StyleSheet.create({
     padding: 12,
   },
 });
+
+const mapStateToProps = (state) => {
+  return {
+    user_info: state.account.user_info,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    getMatchingList: (data) => {
+      dispatch(getMatchingListAccount(data));
+    },
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ChangeAvatar);

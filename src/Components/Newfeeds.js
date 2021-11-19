@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { DOMAIN } from '../store/constant';
 import { Avatar } from 'react-native-elements';
 import { FontAwesome } from '@expo/vector-icons';
 
 export default function Newfeeds({ onNavigation, userData }) {
+  
   return (
     <View style={{ width: '100%', height: 100, backgroundColor: '#fff', marginBottom: 10 }}>
       <View
@@ -19,7 +20,7 @@ export default function Newfeeds({ onNavigation, userData }) {
         }}
       >
         <TouchableOpacity onPress={() => onNavigation.navigate('Personal')}>
-          {userData.avatar ? (
+          {userData?.avatar ? (
             <Avatar
               size="medium"
               rounded
@@ -37,14 +38,14 @@ export default function Newfeeds({ onNavigation, userData }) {
           )}
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => onNavigation.navigate('CreatePost', { userData })}
+          onPress={() => onNavigation.navigate('CreatePost', { userData: userData })}
           style={{ width: '80%', marginLeft: 10, borderRadius: 10, paddingLeft: 6 }}
         >
           <Text style={{ color: 'gray', fontSize: 20 }}>Bạn đang nghĩ gì vậy?</Text>
         </TouchableOpacity>
       </View>
       <TouchableOpacity
-        onPress={() => onNavigation.navigate('ImagePicker', { userData })}
+        onPress={() => onNavigation.navigate('ImagePicker', { userData : userData})}
         style={{
           width: '100%',
           height: '40%',

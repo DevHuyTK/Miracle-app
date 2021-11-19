@@ -1,24 +1,25 @@
-import React from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Avatar, Icon } from 'react-native-elements';
 import { DOMAIN } from '../../store/constant';
 
-export default function HeaderInfo({ userData, totalData, navigation }) {
-  const userFollow = userData?.follower_list?.length;
-  const userFollowing = userData?.following_list?.length;
+export default function HeaderInfo({ totalData, navigation, user_info }) {
 
+  const userFollow = user_info?.follower_list?.length;
+  const userFollowing = user_info?.following_list?.length;
+  
   return (
     <View>
       <View backgroundColor="#fff">
         <View style={{ paddingTop: 10, marginBottom: 20 }}>
           <View style={{ flexDirection: 'row' }}>
             <View style={{ flex: 1, alignItems: 'center' }}>
-              {userData?.avatar ? (
+              {user_info?.avatar ? (
                 <Avatar
                   size="large"
                   rounded
                   source={{
-                    uri: `${DOMAIN}/${userData.avatar}`,
+                    uri: `${DOMAIN}/${user_info.avatar}`,
                   }}
                 />
               ) : (
@@ -33,7 +34,7 @@ export default function HeaderInfo({ userData, totalData, navigation }) {
             <View style={{ flex: 3 }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
                 <View style={{ alignItems: 'center' }}>
-                  <Text>{Object.keys(totalData).length}</Text>
+                  <Text>{totalData?.length}</Text>
                   <Text style={{ fontSize: 12, color: 'gray' }}>Bài viết</Text>
                 </View>
                 <View style={{ alignItems: 'center' }}>
@@ -78,7 +79,6 @@ export default function HeaderInfo({ userData, totalData, navigation }) {
               </View>
             </View>
           </View>
-          
         </View>
       </View>
     </View>

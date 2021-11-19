@@ -3,6 +3,7 @@ const DEFAULT_STATE = {
   newfeed: [],
   usernewfeed: [],
   alluser: [],
+  user_info: {},
   dataFetched: false,
   isFetching: false,
   error: false,
@@ -69,6 +70,26 @@ export default (state = DEFAULT_STATE, action) => {
     case types.GET_ALL_USER_FAILURE:
       return {
         ...state,
+        isFetching: false,
+        error: true,
+        errorMessage: action.payload.error,
+      };
+    case types.GET_MATCHING_LIST_REQUEST:
+      return {
+        matching_list: {},
+        isFetching: true,
+      };
+    case types.GET_MATCHING_LIST_SUCCESS:
+      return {
+        isFetching: false,
+        dataFetched: false,
+        error: false,
+        errorMessage: null,
+        user_info: action.payload.user_info,
+      };
+    case types.GET_MATCHING_LIST_FAILURE:
+      return {
+        matching_list: {},
         isFetching: false,
         error: true,
         errorMessage: action.payload.error,

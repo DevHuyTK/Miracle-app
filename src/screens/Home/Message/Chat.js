@@ -4,57 +4,53 @@ import { StyleSheet, ScrollView, Text, View, ImageBackground } from 'react-nativ
 import ChatAvatar from '../../../Components/Chat/ChatAvatar';
 import ChatLine from '../../../Components/Chat/ChatLine';
 import HeaderChat from '../../../Components/HeaderChat';
-import { ChangeDataContext } from '../../../contexts/ChangeData';
 import socketIOClient from 'socket.io-client';
 import { DOMAIN } from '../../../store/constant';
 import { connect } from 'react-redux';
-import { getAllAccount } from '../../../store/Actions/AccountActions';
 
 const chatEmpty = require('../../../../assets/Chatnone.png');
 
 function Chat(props) {
   const socket = socketIOClient(DOMAIN);
-  const [user, setUser] = useState({});
   const [chatList, setChatList] = useState([]);
-  const [matchingList, setMatchingList] = useState([]);
-  const { isChanged, setIsChanged } = useContext(ChangeDataContext);
+
+  // socket.on('send-message-response', (data) => {
+  //   console.log(data);
+  //   setChatList(data.data);
+  // });
+
+  const getChatList = (token) => {
+    fetch(`${DOMAIN}/api/user/matching_list`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + token,
+      },
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        setChatList(res.data.matching_list);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const jsonValue = await AsyncStorage.getItem('user');
-        return jsonValue != null ? JSON.parse(jsonValue) : null;
-      } catch (e) {
-        console.log(e);
-      }
+    async function getToken() {
+      const token = await AsyncStorage.getItem('token');
+      getChatList(token);
     }
-    fetchData()
-      .then((data) => setUser(data))
-      .catch((error) => console.log(error));
-  }, [!isChanged]);
+    getToken();
+  }, []);
 
-  // useEffect(async () => {
-  //   const token = await AsyncStorage.getItem('token');
-  //   fetch(`${DOMAIN}/api/user`, {
-  //     method: 'GET',
-  //     headers: {
-  //       Authorization: `Bearer ${token}`,
-  //     },
-  //   })
-  //     .then((response) => response.json())
-  //     .then(async (res) => {
-  //       setMatchingList(res.data.matching_list);
-  //       setIsChanged(!isChanged);
-  //     });
+  // useEffect(() => {
+  //   setChatList(props.user_info.matching_list.filter((item) => item.had_message === true));
   // }, []);
-
-  // useEffect(async () => {
-  //   setChatList(matchingList.filter((item) => item.had_message === true));
-  // }, [isChanged]);
 
   const handleOnPress = async (item) => {
     const token = await AsyncStorage.getItem('token');
-    fetch(`${DOMAIN}/api/chat?userId=${item._id}`, {
+    fetch(`${DOMAIN}/api/chat/${item.user_id}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -64,13 +60,13 @@ function Chat(props) {
       .then(async (res) => {
         socket.emit('join', {
           token: token,
-          userIds: [item._id],
+          userIds: [item.user_id],
         });
         props.navigation.navigate('ChatBox', {
           data: item,
           token,
           chat: res.data,
-          user,
+          user: props.user_info,
         });
       });
   };
@@ -85,7 +81,7 @@ function Chat(props) {
       >
         <Text style={styles.title}>Người bạn có thể đang quan tâm</Text>
         <ScrollView style={styles.newMatch} horizontal showsHorizontalScrollIndicator={false}>
-          {props.alluser.map((item, index) => {
+          {props.user_info?.following_list?.map((item, index) => {
             return (
               <ChatAvatar
                 key={index}
@@ -103,10 +99,10 @@ function Chat(props) {
               <ChatLine
                 key={index}
                 name={item.full_name ? item.full_name : item.username}
-                message={item.message.message}
+                // message={item?.message.message}
                 onPress={() => handleOnPress(item)}
-                isUserSending={item.message.user_post._id === user._id}
-                isSeen={item.message.is_seen}
+                // isUserSending={item.message.user_post._id === user._id}
+                // isSeen={item.message.is_seen}
                 avatar={item.avatar}
               />
             );
@@ -150,19 +146,12 @@ const styles = StyleSheet.create({
   title: {
     margin: 8,
     fontWeight: '500',
-    color: '#fe1c15',
+    color: '#de6564',
   },
 });
 
 const mapStateToProps = (state) => ({
-  alluser: state.account.alluser,
+  user_info: state.account.user_info,
 });
-const mapDispatchToProps = (dispatch) => {
-  return {
-    getAllUser: (data) => {
-      dispatch(getAllAccount(data));
-    },
-  };
-};
 
-export default connect(mapStateToProps, mapDispatchToProps)(Chat);
+export default connect(mapStateToProps)(Chat);

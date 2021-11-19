@@ -1,32 +1,13 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import Header from '../../../Components/Header';
 import { Avatar, ListItem, Icon, Input } from 'react-native-elements';
 import AccountItem from '../../../Components/AccountItem';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DOMAIN } from '../../../store/constant';
-import { ChangeDataContext } from '../../../contexts/ChangeData';
+import { connect } from 'react-redux';
 
-function Account({ navigation }) {
-  const [loginData, setLoginData] = useState({});
-  const { isChanged, setIsChanged } = useContext(ChangeDataContext);
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const jsonValue = await AsyncStorage.getItem('user');
-        return jsonValue != null ? JSON.parse(jsonValue) : null;
-      } catch (e) {
-        console.log(e);
-      }
-    }
-    fetchData()
-      .then((data) => setLoginData(data))
-      .catch((error) => console.log(error));
-  }, [isChanged]);
-
-  console.log(isChanged);
-
+function Account({ navigation, ...props }) {
   const setting = [
     {
       icon: 'settings',
@@ -62,7 +43,6 @@ function Account({ navigation }) {
   const handleLogout = async () => {
     navigation.navigate('Login');
     await AsyncStorage.removeItem('token');
-    await AsyncStorage.removeItem('user');
   };
 
   return (
@@ -83,12 +63,12 @@ function Account({ navigation }) {
           }}
         >
           <View style={{ width: '35%', justifyContent: 'center', alignItems: 'center' }}>
-            {loginData.avatar ? (
+            {props.user_info?.avatar ? (
               <Avatar
                 size="large"
                 rounded
                 source={{
-                  uri: `${DOMAIN}/${loginData.avatar}`,
+                  uri: `${DOMAIN}/${props.user_info?.avatar}`,
                 }}
               />
             ) : (
@@ -101,8 +81,8 @@ function Account({ navigation }) {
             )}
           </View>
           <View style={{ width: '65%', justifyContent: 'center' }}>
-            <Text style={{ fontWeight: 'bold', fontSize: 26 }}>{loginData.full_name}</Text>
-            <Text style={{ fontSize: 16 }}>{loginData.email}</Text>
+            <Text style={{ fontWeight: 'bold', fontSize: 26 }}>{props.user_info?.full_name}</Text>
+            <Text style={{ fontSize: 16 }}>{props.user_info?.email}</Text>
           </View>
         </TouchableOpacity>
         <View
@@ -158,5 +138,9 @@ function Account({ navigation }) {
     </View>
   );
 }
+const mapStateToProps = (state) => ({
+  user_info: state.account.user_info,
+});
 
-export default Account;
+
+export default connect(mapStateToProps)(Account);
