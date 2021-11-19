@@ -20,7 +20,8 @@ import RNPickerSelect from 'react-native-picker-select';
 import { Icon } from 'react-native-elements';
 import LottieView from 'lottie-react-native';
 
-const img = require('../../../../assets/logo.png');
+const img = require('../../../../assets/Miracle.png');
+
 const pickerStyle = {
   inputIOS: {
     width: '90%',
@@ -130,7 +131,7 @@ function Register({ navigation }) {
           </TouchableOpacity>
           <View style={styles.logo}>
             <ImageBackground source={img} style={styles.image} />
-            <Text style={styles.logoText}>miracle</Text>
+            {/* <Text style={styles.logoText}>miracle</Text> */}
           </View>
           <TextInput
             style={styles.input}
@@ -266,8 +267,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   image: {
-    width: 40,
-    height: 40,
+    width: 100,
+    height: 80,
     marginRight: 10,
   },
   input: {

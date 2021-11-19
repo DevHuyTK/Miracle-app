@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -20,16 +20,15 @@ import { getStatusBarHeight } from 'react-native-status-bar-height';
 import { LinearGradient } from 'expo-linear-gradient';
 import { connect } from 'react-redux';
 import {
-  getAccountNewFeed,
-  getAccountUserNewFeed,
+  getMatchingListAccount,
   getAllAccount,
 } from '../../../store/Actions/AccountActions';
 import LottieView from 'lottie-react-native';
 
-const img = require('../../../../assets/logo.png');
+const img = require('../../../../assets/Miracle.png');
 
 //This's what u see (_ _")
-function Login(props) {
+function Login({ navigation, ...props }) {
   const [userName, serUserName] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -72,15 +71,13 @@ function Login(props) {
       .then(async (res) => {
         if (res.status === 1) {
           await AsyncStorage.setItem('token', res.token);
-          await AsyncStorage.setItem('user', JSON.stringify(res.user));
-          props.getNewFeed(res.token);
-          props.getUserNewFeed(res.token);
+          await props.getMatchingList(res.token);
           props.getAllUser();
+          navigation.navigate('Home');
+          setLoading(false);
           setStatus('');
           serUserName('');
           setPassword('');
-          setLoading(false);
-          props.navigation.navigate('Home');
         } else {
           setStatus(res.message);
           setModelVisible(true);
@@ -99,7 +96,7 @@ function Login(props) {
   };
 
   const handleChangeStack = () => {
-    props.navigation.navigate('Signup2');
+    navigation.navigate('Signup2');
   };
 
   LogBox.ignoreAllLogs(true);
@@ -112,7 +109,7 @@ function Login(props) {
             <View style={styles.login}>
               <View style={styles.logo}>
                 <ImageBackground source={img} style={styles.image} />
-                <Text style={styles.logoText}>miracle</Text>
+                {/* <Text style={styles.logoText}>iracle</Text> */}
               </View>
               <TextInput
                 style={styles.input}
@@ -160,17 +157,19 @@ function Login(props) {
     </SafeAreaView>
   );
 }
-const mapStateToProps = (state) => ({
-  newfeed: state.account.newfeed,
-});
+const mapStateToProps = (state) => {
+  return {
+    user_info: state.account.user_info,
+    newfeed: state.account.newfeed,
+    user_newfeed: state.account.user_newfeed,
+    alluser: state.account.alluser,
+  };
+};
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    getNewFeed: (data) => {
-      dispatch(getAccountNewFeed(data));
-    },
-    getUserNewFeed: (data) => {
-      dispatch(getAccountUserNewFeed(data));
+    getMatchingList: (data) => {
+      dispatch(getMatchingListAccount(data));
     },
     getAllUser: (data) => {
       dispatch(getAllAccount(data));
@@ -232,13 +231,12 @@ const styles = StyleSheet.create({
   },
   logoText: {
     fontSize: 56,
-    color: '#FFF',
+    color: '#4ede79',
     fontWeight: 'bold',
   },
   image: {
-    width: 40,
-    height: 40,
-    marginRight: 10,
+    width: 125,
+    height: 100,
   },
   input: {
     width: '90%',

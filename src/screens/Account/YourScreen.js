@@ -1,7 +1,6 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, FlatList, Text } from 'react-native';
 import Post from '../../Components/Post';
-import { ChangeDataContext } from '../../contexts/ChangeData';
 import YourHeaderInfo from '../../Components/Profile/YourHeaderInfo';
 import LottieView from 'lottie-react-native';
 import { DOMAIN } from '../../store/constant';
@@ -9,7 +8,6 @@ import { DOMAIN } from '../../store/constant';
 function YourScreen({ navigation, route }) {
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { isChanged, setIsChanged } = useContext(ChangeDataContext);
   const { data, token, posts_userId, user } = route.params;
 
   useEffect(() => {
@@ -25,7 +23,7 @@ function YourScreen({ navigation, route }) {
         setPosts(res.data);
         setIsLoading(false);
       });
-  }, [!isChanged]);
+  }, []);
 
   // console.log(posts);
 

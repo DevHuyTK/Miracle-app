@@ -11,11 +11,11 @@ import {
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SettingTitle from '../../Components/Profile/SettingTitle';
-import { ChangeDataContext } from '../../contexts/ChangeData';
 import { DOMAIN } from '../../store/constant';
+import { getMatchingListAccount } from '../../store/Actions/AccountActions';
+import { connect } from 'react-redux';
 
-const ChangePassword = ({ navigation }) => {
-  const { isChanged, setIsChanged } = useContext(ChangeDataContext);
+const ChangePassword = ({ navigation, ...props }) => {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
@@ -49,7 +49,7 @@ const ChangePassword = ({ navigation }) => {
             navigation.navigate('Account');
           }, 1000);
           setLoading(false);
-          setIsChanged(!isChanged);
+          props.getMatchingList(token);
         } else {
           setErrorText(res.message);
           await Alert.alert(res.message);
@@ -242,4 +242,12 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ChangePassword;
+const mapDispatchToProps = (dispatch) => {
+  return {
+    getMatchingList: (data) => {
+      dispatch(getMatchingListAccount(data));
+    },
+  };
+};
+
+export default connect( mapDispatchToProps)(ChangePassword);

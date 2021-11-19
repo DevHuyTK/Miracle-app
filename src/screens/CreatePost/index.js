@@ -21,7 +21,7 @@ import { DOMAIN } from '../../store/constant';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { connect } from 'react-redux';
 import { setImage } from './../../store/Actions/ImageGridAction';
-import { getAccountNewFeed } from './../../store/Actions/AccountActions';
+import { getAccountNewFeed, getAccountUserNewFeed } from './../../store/Actions/AccountActions';
 import mime from 'mime';
 
 const { width } = Dimensions.get('window');
@@ -111,7 +111,8 @@ function CreatePost({ navigation, route, ...props }) {
         if (res.status === 1) {
           setStatus(res.message);
           navigation.navigate('Community');
-          props.getNewFeed();
+          props.getNewFeed(token);
+          props.getUserNewFeed(token);
           setLoading(false);
         } else {
           setErrorText(res.message);
@@ -216,8 +217,11 @@ const mapDispatchToProps = (dispatch) => {
     setImageGrid: (payload) => {
       dispatch(setImage(payload));
     },
-    getNewFeed: (payload) => {
-      dispatch(getAccountNewFeed(payload));
+    getNewFeed: (data) => {
+      dispatch(getAccountNewFeed(data));
+    },
+    getUserNewFeed: (data) => {
+      dispatch(getAccountUserNewFeed(data));
     },
   };
 };

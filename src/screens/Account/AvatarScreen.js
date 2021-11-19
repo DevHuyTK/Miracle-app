@@ -1,32 +1,11 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { Avatar, Icon } from 'react-native-elements';
-import { ChangeDataContext } from '../../contexts/ChangeData';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DOMAIN } from '../../store/constant';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
+import { connect } from 'react-redux';
 
-function AvatarScreen({ navigation }) {
-  const { isChanged, setIsChanged } = useContext(ChangeDataContext);
-  const [avatar, setAvatar] = useState('');
-  const [fullName, setFullName] = useState('');
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const jsonValue = await AsyncStorage.getItem('user');
-        return jsonValue != null ? JSON.parse(jsonValue) : null;
-      } catch (e) {
-        console.log(e);
-      }
-    }
-    fetchData()
-      .then((data) => {
-        setAvatar(data.avatar);
-        setFullName(data.full_name);
-      })
-      .catch((error) => console.log(error));
-  }, [isChanged]);
+function AvatarScreen({ navigation, ...props }) {
 
   return (
     <View style={styles.container}>
@@ -40,10 +19,10 @@ function AvatarScreen({ navigation }) {
         />
         <Text style={styles.title}>Trở về</Text>
       </TouchableOpacity>
-      {avatar ? (
+      {props.user_info.avatar ? (
         <Avatar
           source={{
-            uri: `${DOMAIN}/${avatar}`,
+            uri: `${DOMAIN}/${props.user_info.avatar}`,
           }}
           containerStyle={{ backgroundColor: 'gray' }}
           style={styles.avatar}
@@ -56,7 +35,7 @@ function AvatarScreen({ navigation }) {
           style={styles.avatar}
         />
       )}
-      <Text style={styles.info}>{fullName}</Text>
+      <Text style={styles.info}>{props.user_info.full_name ? props.user_info.full_name : props.user_info.username}</Text>
     </View>
   );
 }
@@ -102,4 +81,10 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AvatarScreen;
+const mapStateToProps = state => {
+  return {
+    user_info: state.account.user_info,
+  };
+};
+
+export default AvatarScreen = connect(mapStateToProps)(AvatarScreen);

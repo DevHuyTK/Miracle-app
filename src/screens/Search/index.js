@@ -1,20 +1,18 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SafeAreaView, TouchableHighlight, StyleSheet, FlatList, Alert } from 'react-native';
 import { View, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from 'react-native-vector-icons';
 import { Avatar, ListItem, SearchBar } from 'react-native-elements';
 import { DOMAIN } from '../../store/constant';
-import { ChangeDataContext } from '../../contexts/ChangeData';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { connect } from 'react-redux';
 
-function Search({ navigation }) {
+function Search({ navigation, ...props }) {
   let loading = false;
-  const [user, setUser] = useState({});
   const [datas, setDatas] = useState([]);
   const [status, setStatus] = useState([]);
   const [searchData, setSearchData] = useState([]);
   const [text, setText] = useState('');
-  const { isChanged, setIsChanged } = useContext(ChangeDataContext);
 
   const handleOnPress = async (item) => {
     const token = await AsyncStorage.getItem('token');
@@ -23,23 +21,9 @@ function Search({ navigation }) {
       data: item,
       token,
       posts_userId: item._id,
-      user,
+      user: props.user_info,
     });
   };
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const jsonValue = await AsyncStorage.getItem('user');
-        return jsonValue != null ? JSON.parse(jsonValue) : null;
-      } catch (e) {
-        console.log(e);
-      }
-    }
-    fetchData()
-      .then((data) => setUser(data))
-      .catch((error) => console.log(error));
-  }, [!isChanged]);
 
   useEffect(() => {
     fetch(`${DOMAIN}/api/user/get-users`, {
@@ -175,4 +159,8 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Search;
+const mapStateToProps = (state) => ({
+  user_info: state.user_info,
+});
+
+export default Search = connect(mapStateToProps)(Search);

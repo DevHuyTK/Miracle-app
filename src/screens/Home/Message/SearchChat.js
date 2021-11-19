@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   Text,
   TextInput,
@@ -10,11 +10,13 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
+  SafeAreaView,
 } from 'react-native';
 import { Avatar, ListItem, SearchBar, Icon } from 'react-native-elements';
 import { DOMAIN } from '../../../store/constant';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import socketIOClient from 'socket.io-client';
+import { connect } from 'react-redux';
 
 const { width } = Dimensions.get('window');
 
@@ -45,7 +47,7 @@ function SearchChat(props) {
 
   const handleOnPress = async (item) => {
     const token = await AsyncStorage.getItem('token');
-    fetch(`${DOMAIN}/chat?userId=${item._id}`, {
+    fetch(`${DOMAIN}/api/chat/${item._id}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -57,11 +59,11 @@ function SearchChat(props) {
           token: token,
           userIds: [item._id],
         });
-        navigation.navigate('ChatBox', {
+        props.navigation.navigate('ChatBox', {
           data: item,
           token,
           chat: res.data,
-          user,
+          user: props.user_info,
         });
       });
   };
@@ -91,7 +93,7 @@ function SearchChat(props) {
   const renderHeader = () => {
     return (
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-        <ScrollView style={styles.container}>
+        <View style={styles.container}>
           <View style={styles.header}>
             <View style={styles.left}>
               <Icon
@@ -102,8 +104,6 @@ function SearchChat(props) {
               />
               <Text style={styles.leftText}>Tạo cuộc trò chuyện</Text>
             </View>
-          </View>
-          <View>
             <SearchBar
               placeholder="Tìm kiếm ..."
               containerStyle={{
@@ -119,18 +119,18 @@ function SearchChat(props) {
               value={text}
             />
           </View>
-        </ScrollView>
+        </View>
       </TouchableWithoutFeedback>
     );
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 }}>
       <FlatList
         showsVerticalScrollIndicator={false}
         data={searchData}
         renderItem={({ item, key }) => (
-          <View>
+          <>
             <ListItem key={key} onPress={() => handleOnPress(item)}>
               {item.avatar ? (
                 <Avatar
@@ -150,7 +150,9 @@ function SearchChat(props) {
               )}
               {/* <Avatar rounded source={DOMAIN/item.avatar} /> */}
               <ListItem.Content>
-                <ListItem.Title style={{ fontWeight: 'bold' }}>{item.full_name ? item.full_name : item.username}</ListItem.Title>
+                <ListItem.Title style={{ fontWeight: 'bold' }}>
+                  {item.full_name ? item.full_name : item.username}
+                </ListItem.Title>
                 <ListItem.Subtitle>{item.username}</ListItem.Subtitle>
               </ListItem.Content>
               <ListItem.Chevron color="white" />
@@ -163,12 +165,12 @@ function SearchChat(props) {
                 marginLeft: '14%',
               }}
             />
-          </View>
+          </>
         )}
-        keyExtractor={(item) => item.email}
+        keyExtractor={(item) => item._id}
         ListHeaderComponent={renderHeader()}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -179,17 +181,19 @@ const styles = StyleSheet.create({
   },
   header: {
     width: width,
-    height: 60,
+    height: 100,
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 0.5,
     borderBottomColor: 'gray',
+    flexWrap: 'wrap'
   },
   left: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingLeft: 16,
     width: '70%',
+    marginBottom: 10,
   },
   leftText: {
     marginLeft: 15,
@@ -215,4 +219,10 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SearchChat;
+const mapStateToProps = (state) => {
+  return {
+    user_info: state.account.user_info,
+  };
+};
+
+export default  connect(mapStateToProps)(SearchChat);

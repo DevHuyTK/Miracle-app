@@ -44,7 +44,9 @@ export default function Post({ post, onNavigation, userData }) {
     <View style={{ marginVertical: 10, backgroundColor: '#fff', width: width }}>
       <View style={styles.header}>
         <View>
-          <TouchableOpacity onPress={() => handleOnPress(post)} style={styles.left}>
+          <TouchableOpacity onPress={() => {
+            post.user_id === userData._id ? onNavigation.navigate('Personal') : handleOnPress(post);
+          }} style={styles.left}>
             {post?.avatar ? (
               <Avatar
                 size="medium"
