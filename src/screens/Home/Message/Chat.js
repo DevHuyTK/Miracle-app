@@ -49,7 +49,6 @@ function Chat(props) {
   // }, []);
 
   const handleOnPress = async (item) => {
-    console.log(item);
     const token = await AsyncStorage.getItem('token');
     fetch(`${DOMAIN}/api/chat/${item.user_id}`, {
       method: 'GET',

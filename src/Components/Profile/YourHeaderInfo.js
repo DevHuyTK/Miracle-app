@@ -13,31 +13,50 @@ function YourHeaderInfo({ navigation, token, userData, posts, ...props }) {
   const userFollow = userData?.follower_list?.length;
   const userFollowing = userData?.following_list?.length;
 
+  useEffect(() => {
+    userFollowIsValid();
+  }, []);
+
+  const userFollowIsValid = async () => {
+    if (props.user_info?.following_list.find((item) => item.user_id.toString() == userData._id)) {
+      return setIsValid(true);
+    } else {
+      return setIsValid(false);
+    }
+  };
+
+  const onFollowPressed = (user) => {
+    if (isValid === true) {
+      handleUnFollow(user);
+    } else {
+      handleFollow(user);
+    }
+    setIsValid(!isValid);
+    props.getMatchingList(token);
+  };
+
   const handleFollow = async (user) => {
     socket.emit('follow-user', {
       token: token,
       userId: user._id,
     });
-    socket.on('follow-user-response', (user) => {
-      console.log(user, 'a');
-    });
-    userFollowIsValid();
-    props.getMatchingList(token);
+    // socket.on('follow-user-response', (user) => {
+    //   console.log(user, 'a');
+    // });
   };
   const handleUnFollow = async (user) => {
     socket.emit('unfollow-user', {
       token: token,
       userId: user._id,
     });
-    socket.on('unfollow-user-response', (user) => {
-      console.log(user, 'a');
-    });
-    userFollowIsValid();
-    props.getMatchingList(token);
+    // socket.on('unfollow-user-response', (user) => {
+    //   console.log(user, 'a');
+    // });
   };
+  
 
   const handleOnPress = async (item) => {
-    fetch(`${DOMAIN}/api/chat?userId=${item._id}`, {
+    fetch(`${DOMAIN}/api/chat/${item.user_id}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -56,14 +75,6 @@ function YourHeaderInfo({ navigation, token, userData, posts, ...props }) {
           user: props.user_info,
         });
       });
-  };
-
-  const userFollowIsValid = async () => {
-    if (props.user_info?.following_list.find((item) => item.user_id.toString() == userData._id)) {
-      return setIsValid(true);
-    } else {
-      return setIsValid(false);
-    }
   };
 
   return (
@@ -119,7 +130,7 @@ function YourHeaderInfo({ navigation, token, userData, posts, ...props }) {
           </View>
           <View style={{ flexDirection: 'row', paddingTop: 10, paddingHorizontal: 10 }}>
             <TouchableOpacity
-              onPress={() => (isValid ? handleUnFollow(userData) : handleFollow(userData))}
+              onPress={() => onFollowPressed(userData)}
               style={{
                 flex: 1,
                 marginLeft: 10,
@@ -131,7 +142,7 @@ function YourHeaderInfo({ navigation, token, userData, posts, ...props }) {
                 borderRadius: 6,
               }}
             >
-              {isValid ? <Text>Hủy theo dõi</Text> : <Text>Theo dõi</Text>}
+              <Text>{isValid ? 'Hủy theo dõi' : 'Theo dõi'}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => handleOnPress(userData)}

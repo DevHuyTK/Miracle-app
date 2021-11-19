@@ -79,7 +79,6 @@ function ChangeAvatar({ navigation, ...props }) {
     type: mime.getType(newImageUri),
     uri: newImageUri,
   });
-  console.log(data);
 
   const handleUploadAvatar = async () => {
     setLoading(true);

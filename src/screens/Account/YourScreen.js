@@ -25,7 +25,6 @@ function YourScreen({ navigation, route }) {
       });
   }, []);
 
-  // console.log(posts);
 
   const renderHeader = (loginData) => (
     <View

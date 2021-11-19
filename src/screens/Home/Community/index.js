@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, FlatList, SafeAreaView } from 'react-native';
 import Post from '../../../Components/Post';
 import Header from '../../../Components/Header';
@@ -9,9 +9,11 @@ import { getAccountUserNewFeed, getAccountNewFeed } from '../../../store/Actions
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function Community({ navigation, ...props }) {
+  const [token, setToken] = useState('');
   useEffect(() => {
     async function getUserInfo() {
       const token = await AsyncStorage.getItem('token');
+      setToken(token);
       props.getUserNewFeed(token);
       props.getNewFeed(token);
     }
@@ -27,7 +29,7 @@ function Community({ navigation, ...props }) {
             data={props.newfeed}
             keyExtractor={(item) => item._id}
             renderItem={({ item }) => (
-              <Post onNavigation={navigation} post={item} userData={props?.user_info} />
+              <Post onNavigation={navigation} post={item} userData={props?.user_info} token={token} />
             )}
             showsVerticalScrollIndicator={false}
             ListHeaderComponent={<Newfeeds onNavigation={navigation} userData={props?.user_info} />}

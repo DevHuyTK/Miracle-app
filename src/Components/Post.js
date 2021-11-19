@@ -3,19 +3,43 @@ import { View, Text, StyleSheet, Dimensions, TouchableOpacity } from 'react-nati
 import { Avatar, Icon } from 'react-native-elements';
 import ImageComp from './ImageComp';
 import { DOMAIN } from '../store/constant';
-import { ChangeDataContext } from '../contexts/ChangeData';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import socketIOClient from 'socket.io-client';
 
 const { width } = Dimensions.get('window');
 
-export default function Post({ post, onNavigation, userData }) {
+export default function Post({ post, onNavigation, userData, token }) {
   const [isLiked, setIsLike] = useState(false);
-  const [likesCount, setLikesCount] = useState(post.likesCount);
-  const { isChanged, setIsChanged } = useContext(ChangeDataContext);
+  const [likesCount, setLikesCount] = useState(post.like_count?.length);
+  const socket = socketIOClient(DOMAIN);
+
+  const handleLike = async (post) => {
+    socket.emit('like-post', {
+      token: token,
+      postId: post._id,
+    });
+    socket.on('like-post-response', (post) => {
+      console.log(post, 'a');
+    });
+  };
+  const handleUnLike = async (post) => {
+    socket.emit('unlike-post', {
+      token: token,
+      postId: post._id,
+    });
+    socket.on('unlike-post-response', (post) => {
+      console.log(post, 'a');
+    });
+  };
 
   const onLikePressed = () => {
     const amount = isLiked ? -1 : 1;
     setLikesCount(likesCount + amount);
+    if (amount === -1) {
+      handleUnLike(post);
+    } else {
+      handleLike(post);
+    }
 
     setIsLike(!isLiked);
   };
@@ -39,14 +63,20 @@ export default function Post({ post, onNavigation, userData }) {
         });
       });
   };
+  
 
   return (
     <View style={{ marginVertical: 10, backgroundColor: '#fff', width: width }}>
       <View style={styles.header}>
         <View>
-          <TouchableOpacity onPress={() => {
-            post.user_id === userData._id ? onNavigation.navigate('Personal') : handleOnPress(post);
-          }} style={styles.left}>
+          <TouchableOpacity
+            onPress={() => {
+              post.user_id === userData._id
+                ? onNavigation.navigate('Personal')
+                : handleOnPress(post);
+            }}
+            style={styles.left}
+          >
             {post?.avatar ? (
               <Avatar
                 size="medium"
@@ -77,16 +107,15 @@ export default function Post({ post, onNavigation, userData }) {
       </View>
       <ImageComp images={post?.photos} />
       <View style={styles.footer}>
-        <View style={styles.likeIcons}>
+        <TouchableOpacity style={styles.likeIcons} onPress={() => onLikePressed()}>
           <Icon
             size={30}
             name={isLiked ? 'thumbs-up' : 'thumbs-o-up'}
             type="font-awesome"
             color="#267ea6"
-            onPress={() => onLikePressed()}
           />
-          <Text style={{ marginLeft: 6, fontSize: 16 }}>{likesCount}</Text>
-        </View>
+          <Text style={{ marginLeft: 6, fontSize: 16 }}>{likesCount} người đã thích</Text>
+        </TouchableOpacity>
         <View style={styles.postAgo}>
           <Text style={{ fontSize: 16, color: 'gray' }}>{post?.postAgo}</Text>
         </View>

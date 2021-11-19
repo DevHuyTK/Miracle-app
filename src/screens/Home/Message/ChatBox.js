@@ -33,7 +33,7 @@ const ChatBox = ({ navigation, route }) => {
     });
     socket.on('send-message-response', (data) => {
       // console.log(data);
-      console.log('send-message-response');
+      // console.log('send-message-response');
       setMessage('');
       setLoading(false);
       setChatList((prevState) => [...prevState, data.data]);
