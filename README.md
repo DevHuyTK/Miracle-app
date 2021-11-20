@@ -18,6 +18,8 @@ How to use this app
 - [Language](https://https://www.javascript.com//) - A programming language that is dynamically typed, garbage collected, and just as fast as JavaScript.
 
 ## Project structure
+
+```
 $PROJECT_ROOT
 │   # Page files
 ├── pages
@@ -26,6 +28,6 @@ $PROJECT_ROOT
 │   # Non-react modules
 ├── public
 │__ # Static files for images and 3d model file
-
+```
 
 Enjoy!
