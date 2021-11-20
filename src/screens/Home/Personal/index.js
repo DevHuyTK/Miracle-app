@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity, FlatList } from 'react-native';
 import Header from '../../../Components/Header';
 import Post from '../../../Components/Post';
@@ -34,7 +34,9 @@ function Personal(props) {
         <FlatList
           data={props.usernewfeed}
           keyExtractor={(item) => item._id}
-          renderItem={({ item }) => <Post post={item} />}
+          renderItem={({ item }) => (
+            <Post post={item} post={item} userData={props.user_info} />
+          )}
           showsVerticalScrollIndicator={false}
           ListHeaderComponent={renderHeader(props.user_info)}
         />
@@ -47,6 +49,5 @@ const mapStateToProps = (state) => ({
   usernewfeed: state.account.usernewfeed,
   user_info: state.account.user_info,
 });
-
 
 export default connect(mapStateToProps)(Personal);

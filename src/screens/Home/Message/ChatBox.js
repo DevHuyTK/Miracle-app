@@ -78,7 +78,7 @@ const ChatBox = ({ navigation, route }) => {
           renderItem={({ item, key }) => {
             const isUserSending = item?.user_id === user._id;
             return (
-              <View key={key} style={{ paddingBottom: 20 }}>
+              <View key={key} style={{ paddingBottom: 5 }}>
                 <View style={styles.chat}>
                   <Text style={isUserSending ? styles.chatRight : styles.chatLeft}>
                     {item?.message}

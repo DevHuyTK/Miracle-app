@@ -24,7 +24,7 @@ function Community({ navigation, ...props }) {
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
       <Header onNavigation={navigation} />
       <SafeAreaView style={{ flex: 2 }}>
-        {props?.newfeed ? (
+        {props?.newfeed && props?.user_info ? (
           <FlatList
             data={props.newfeed}
             keyExtractor={(item) => item._id}
@@ -32,7 +32,7 @@ function Community({ navigation, ...props }) {
               <Post
                 onNavigation={navigation}
                 post={item}
-                userData={props?.user_info}
+                userData={props.user_info}
                 token={token}
               />
             )}

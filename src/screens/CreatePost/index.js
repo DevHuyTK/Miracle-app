@@ -12,6 +12,7 @@ import {
   Image,
   ActivityIndicator,
   Modal,
+  Alert
 } from 'react-native';
 import { useBackHandler } from '@react-native-community/hooks';
 import { FontAwesome } from '@expo/vector-icons';
@@ -94,31 +95,36 @@ function CreatePost({ navigation, route, ...props }) {
   });
   data.append('title', title);
 
-  const handleUploadAvatar = async () => {
+  const handleUploadPost = async () => {
     setLoading(true);
-    const token = await AsyncStorage.getItem('token');
-    fetch(`${DOMAIN}/api/photo/upload-photos`, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'multipart/form-data',
-        Authorization: 'Bearer ' + token,
-      },
-      body: data,
-    })
-      .then((response) => response.json())
-      .then((res) => {
-        if (res.status === 1) {
-          setStatus(res.message);
-          navigation.navigate('Community');
-          props.getNewFeed(token);
-          props.getUserNewFeed(token);
-          setLoading(false);
-        } else {
-          setErrorText(res.message);
-          setLoading(false);
-        }
-      });
+    if (title === '' || props.imageGrid.length === 0) {
+      setLoading(false);
+      Alert.alert('Bạn chưa nhập tiêu đề hoặc chưa chọn ảnh');
+    } else {
+      const token = await AsyncStorage.getItem('token');
+      fetch(`${DOMAIN}/api/photo/upload-photos`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'multipart/form-data',
+          Authorization: 'Bearer ' + token,
+        },
+        body: data,
+      })
+        .then((response) => response.json())
+        .then((res) => {
+          if (res.status === 1) {
+            setStatus(res.message);
+            navigation.navigate('Community');
+            props.getNewFeed(token);
+            props.getUserNewFeed(token);
+            setLoading(false);
+          } else {
+            setErrorText(res.message);
+            setLoading(false);
+          }
+        });
+    }
   };
 
   return (
@@ -137,7 +143,7 @@ function CreatePost({ navigation, route, ...props }) {
             <Text style={styles.leftText}>Tạo bài viết</Text>
           </View>
           <View style={styles.right}>
-            <TouchableOpacity style={styles.topPostButton} onPress={() => handleUploadAvatar()}>
+            <TouchableOpacity style={styles.topPostButton} onPress={() => handleUploadPost()}>
               {loading ? (
                 <ActivityIndicator size={35} color="#fff" />
               ) : (
@@ -184,7 +190,7 @@ function CreatePost({ navigation, route, ...props }) {
           <Text style={{ marginLeft: 10, fontSize: 18 }}>Ảnh</Text>
         </TouchableOpacity>
         <View style={styles.bottomPostContainer}>
-          <TouchableOpacity style={styles.bottomPostButton} onPress={() => handleUploadAvatar()}>
+          <TouchableOpacity style={styles.bottomPostButton} onPress={() => handleUploadPost()}>
             {loading ? (
               <ActivityIndicator size={35} color="#fff" />
             ) : (
