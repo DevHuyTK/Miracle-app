@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { View, StyleSheet, FlatList, SafeAreaView } from 'react-native';
 import Post from '../../../Components/Post';
 import Header from '../../../Components/Header';
@@ -21,7 +21,7 @@ function Community({ navigation, ...props }) {
   }, []);
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: '#fff' }}>
       <Header onNavigation={navigation} />
       <SafeAreaView style={{ flex: 2 }}>
         {props?.newfeed ? (
@@ -29,7 +29,12 @@ function Community({ navigation, ...props }) {
             data={props.newfeed}
             keyExtractor={(item) => item._id}
             renderItem={({ item }) => (
-              <Post onNavigation={navigation} post={item} userData={props?.user_info} token={token} />
+              <Post
+                onNavigation={navigation}
+                post={item}
+                userData={props?.user_info}
+                token={token}
+              />
             )}
             showsVerticalScrollIndicator={false}
             ListHeaderComponent={<Newfeeds onNavigation={navigation} userData={props?.user_info} />}

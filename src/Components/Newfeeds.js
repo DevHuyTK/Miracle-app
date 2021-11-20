@@ -7,7 +7,7 @@ import { FontAwesome } from '@expo/vector-icons';
 export default function Newfeeds({ onNavigation, userData }) {
   
   return (
-    <View style={{ width: '100%', height: 100, backgroundColor: '#fff', marginBottom: 10 }}>
+    <View style={{ width: '100%', height: 100, backgroundColor: '#fff', marginBottom: 10, elevation: 15 }}>
       <View
         style={{
           width: '100%',

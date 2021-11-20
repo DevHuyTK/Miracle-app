@@ -13,6 +13,7 @@ function Personal(props) {
         paddingVertical: 10,
         backgroundColor: 'white',
         marginTop: -15,
+        elevation: 15,
       }}
     >
       <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{loginData?.full_name}</Text>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -84,7 +84,7 @@ function accDetail({ navigation, ...props }) {
       .then((response) => response.json())
       .then(async (res) => {
         if (res.status === 1) {
-          await props.getMatchingList(token)
+          await props.getMatchingList(token);
           await navigation.navigate('Account');
           setLoading(false);
           setIsChanged(!isChanged);
@@ -97,7 +97,7 @@ function accDetail({ navigation, ...props }) {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
         <View style={styles.left}>
           <Icon
@@ -106,7 +106,7 @@ function accDetail({ navigation, ...props }) {
             size={30}
             onPress={() => navigation.goBack()}
           />
-          <Text style={styles.leftText}>User Info</Text>
+          <Text style={styles.leftText}>Thông tin người dùng</Text>
         </View>
       </View>
       <View style={styles.settingView}>
@@ -213,7 +213,7 @@ function accDetail({ navigation, ...props }) {
               <TextInput
                 style={styles.textArea}
                 underlineColorAndroid="transparent"
-                placeholder="Type something"
+                placeholder="Hãy viết gì đó"
                 placeholderTextColor="grey"
                 numberOfLines={20}
                 multiline={true}
@@ -426,6 +426,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     backgroundColor: '#FFF',
     marginBottom: 20,
+    elevation: 15,
   },
   settingItemBorder: {
     flexDirection: 'row',
