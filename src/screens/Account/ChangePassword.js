@@ -76,7 +76,7 @@ const ChangePassword = ({ navigation, ...props }) => {
         <View style={styles.settingBox}>
           <View style={styles.settingItemBorder}>
             <View style={styles.flexBox}>
-              <Text style={styles.itemText}>Old Password</Text>
+              <Text style={styles.itemText}>Mật khẩu cũ</Text>
             </View>
             <View style={styles.flexBox}>
               <TextInput
@@ -94,7 +94,7 @@ const ChangePassword = ({ navigation, ...props }) => {
           </View>
           <View style={styles.settingItemBorder}>
             <View style={styles.flexBox}>
-              <Text style={styles.itemText}>New Password</Text>
+              <Text style={styles.itemText}>Mật khẩu mới</Text>
             </View>
             <View style={styles.flexBox}>
               <TextInput
@@ -113,7 +113,7 @@ const ChangePassword = ({ navigation, ...props }) => {
           </View>
           <View style={styles.settingItem}>
             <View style={styles.flexBox}>
-              <Text style={styles.itemText}>Re New Password</Text>
+              <Text style={styles.itemText}>Xác nhận mật khẩu</Text>
             </View>
             <View style={styles.flexBox}>
               <TextInput
@@ -178,13 +178,14 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 50,
-    fontSize: 16,
+    fontSize: 15,
   },
   settingBox: {
     width: '100%',
     paddingHorizontal: 20,
     backgroundColor: '#FFF',
     marginBottom: 20,
+    elevation: 15,
   },
   settingItemBorder: {
     flexDirection: 'row',
@@ -209,7 +210,7 @@ const styles = StyleSheet.create({
     height: 50,
   },
   itemText: {
-    fontSize: 17,
+    fontSize: 15,
     lineHeight: 50,
   },
   loading: {

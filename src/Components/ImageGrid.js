@@ -35,7 +35,7 @@ function ImagesGrid(props) {
           <Image style={styles.image} source={{ uri: props.imageGrid[0] }} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.delButton} onPress={() => deleteHandle(0)}>
-          <Feather name="x-circle" color="white" size={width / 12} style={{ opacity: 0.8 }} />
+          <Feather name="x-circle" color="gray" size={width / 12} style={{ opacity: 0.8 }} />
         </TouchableOpacity>
       </View>
     );
@@ -61,7 +61,7 @@ function ImagesGrid(props) {
             style={styles.delButton}
             onPress={() => deleteHandle(conditionalRender ? 1 : 0)}
           >
-            <Feather name="x-circle" color="white" size={width / 12} style={{ opacity: 0.8 }} />
+            <Feather name="x-circle" color="gray" size={width / 12} style={{ opacity: 0.8 }} />
           </TouchableOpacity>
         </View>
         <View style={styles.imageContainer1}>
@@ -78,7 +78,7 @@ function ImagesGrid(props) {
             style={styles.delButton}
             onPress={() => deleteHandle(conditionalRender ? 2 : 1)}
           >
-            <Feather name="x-circle" color="white" size={width / 12} style={{ opacity: 0.8 }} />
+            <Feather name="x-circle" color="gray" size={width / 12} style={{ opacity: 0.8 }} />
           </TouchableOpacity>
         </View>
       </View>
@@ -95,7 +95,7 @@ function ImagesGrid(props) {
           <Image style={styles.image} source={{ uri: props.imageGrid[props.imageGrid.length - 1] }} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.delButton} onPress={() => deleteHandle(props.imageGrid.length - 1)}>
-          <Feather name="x-circle" color="white" size={width / 12} style={{ opacity: 0.8 }} />
+          <Feather name="x-circle" color="gray" size={width / 12} style={{ opacity: 0.8 }} />
         </TouchableOpacity>
       </View>
     );
@@ -147,7 +147,7 @@ function ImagesGrid(props) {
             style={styles.delButton}
             onPress={() => deleteHandle(conditionalRender ? 1 : 2)}
           >
-            <Feather name="x-circle" color="white" size={width / 12} style={{ opacity: 0.8 }} />
+            <Feather name="x-circle" color="gray" size={width / 12} style={{ opacity: 0.8 }} />
           </TouchableOpacity>
         </View>
         <View style={styles.imageContainer2}>
@@ -164,7 +164,7 @@ function ImagesGrid(props) {
             style={styles.delButton}
             onPress={() => deleteHandle(conditionalRender ? 2 : 3)}
           >
-            <Feather name="x-circle" color="white" size={width / 12} style={{ opacity: 0.8 }} />
+            <Feather name="x-circle" color="gray" size={width / 12} style={{ opacity: 0.8 }} />
           </TouchableOpacity>
         </View>
         {overlay}

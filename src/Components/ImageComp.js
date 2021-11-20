@@ -78,7 +78,7 @@ function ImageComp({ images }) {
     );
   }
 
-  if (images === null || images === '') {
+  if (images === null || images === '' || images === [] ) {
     return null;
   }
 

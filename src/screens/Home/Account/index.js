@@ -11,11 +11,11 @@ function Account({ navigation, ...props }) {
   const setting = [
     {
       icon: 'settings',
-      title: 'Settings',
+      title: 'Cài đặt',
     },
     {
       icon: 'language',
-      title: 'Languages',
+      title: 'Ngôn ngữ',
     },
   ];
   const account = [
@@ -36,7 +36,7 @@ function Account({ navigation, ...props }) {
   const help = [
     {
       icon: 'report-problem',
-      title: 'Report problem',
+      title: 'Báo cáo sự cố',
     },
   ];
 
@@ -46,7 +46,7 @@ function Account({ navigation, ...props }) {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: '#fff' }}>
       <Header onNavigation={navigation} />
 
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -57,6 +57,7 @@ function Account({ navigation, ...props }) {
             height: '16%',
             width: '100%',
             flexDirection: 'row',
+            elevation: 15,
           }}
           onPress={() => {
             navigation.navigate('Avatar');
@@ -82,7 +83,7 @@ function Account({ navigation, ...props }) {
           </View>
           <View style={{ width: '65%', justifyContent: 'center' }}>
             <Text style={{ fontWeight: 'bold', fontSize: 26 }}>{props.user_info?.full_name}</Text>
-            <Text style={{ fontSize: 16 }}>{props.user_info?.email}</Text>
+            <Text style={{ fontSize: 15 }}>{props.user_info?.email}</Text>
           </View>
         </TouchableOpacity>
         <View
@@ -96,7 +97,7 @@ function Account({ navigation, ...props }) {
         />
         <AccountItem
           parentIcon="settings"
-          parentTitle="Settings & Privacy"
+          parentTitle="Cài đặt & quyền riêng tư"
           list={setting}
           onNavigation={navigation}
         />
@@ -108,19 +109,19 @@ function Account({ navigation, ...props }) {
         />
         <AccountItem
           parentIcon="help-outline"
-          parentTitle="Help & Support"
+          parentTitle="Trợ giúp & hỗ trợ"
           list={help}
           onNavigation={navigation}
         />
         <ListItem.Accordion
           noIcon={true}
           style={{ marginVertical: 5, marginHorizontal: 15, borderRadius: 20 }}
-          containerStyle={{ borderRadius: 20 }}
+          containerStyle={{ borderRadius: 20, elevation: 15 }}
           content={
             <>
               <Icon name="logout" size={30} />
               <ListItem.Content>
-                <ListItem.Title style={{ fontWeight: 'bold' }}>Log out</ListItem.Title>
+                <ListItem.Title style={{ fontWeight: 'bold' }}>Đăng xuất</ListItem.Title>
               </ListItem.Content>
             </>
           }
@@ -131,7 +132,7 @@ function Account({ navigation, ...props }) {
           style={{
             height: 20,
             marginHorizontal: '10%',
-            marginBottom: 10,
+            marginBottom: 60,
           }}
         />
       </ScrollView>

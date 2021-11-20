@@ -21,7 +21,7 @@ export default function AccountItem({ parentIcon, parentTitle, list, onNavigatio
   return (
     <ListItem.Accordion
       style={{ marginVertical: 5, marginHorizontal: 15, borderRadius: 20 }}
-      containerStyle={{ borderRadius: 20 }}
+      containerStyle={{ borderRadius: 20, elevation: 15 }}
       content={
         <>
           <Icon name={parentIcon} size={30} />
@@ -38,7 +38,7 @@ export default function AccountItem({ parentIcon, parentTitle, list, onNavigatio
       {list.map((item, i) => (
         <ListItem
           style={{ marginHorizontal: 30, borderRadius: 20, marginVertical: 5 }}
-          containerStyle={{ borderRadius: 20 }}
+          containerStyle={{ borderRadius: 20, elevation: 15 }}
           key={i}
           onPress={() => clickEventListener(i)}
         >

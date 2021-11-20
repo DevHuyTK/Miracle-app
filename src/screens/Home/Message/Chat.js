@@ -42,7 +42,7 @@ function Chat(props) {
       getChatList(token);
     }
     getToken();
-  }, []);
+  }, [chatList]);
 
   // useEffect(() => {
   //   setChatList(props.user_info.matching_list.filter((item) => item.had_message === true));
@@ -79,19 +79,23 @@ function Chat(props) {
         showsVerticalScrollIndicator={false}
         showsHorizontalScrollIndicator={false}
       >
-        <Text style={styles.title}>Người bạn có thể đang quan tâm</Text>
-        <ScrollView style={styles.newMatch} horizontal showsHorizontalScrollIndicator={false}>
-          {props.user_info?.following_list?.map((item, index) => {
-            return (
-              <ChatAvatar
-                key={index}
-                name={item.full_name || item.username}
-                avatar={item.avatar}
-                onPress={() => handleOnPress(item)}
-              />
-            );
-          })}
-        </ScrollView>
+        {props.user_info.following_list.length > 0 ? (
+          <ScrollView style={styles.newMatch} horizontal showsHorizontalScrollIndicator={false}>
+            {props.user_info?.following_list?.map((item, index) => {
+              return (
+                <ChatAvatar
+                  key={index}
+                  name={item.full_name || item.username}
+                  avatar={item.avatar}
+                  onPress={() => handleOnPress(item)}
+                />
+              );
+            })}
+          </ScrollView>
+        ) : (
+          <></>
+        )}
+
         {chatList?.length > 0 && <Text style={styles.title}>Tin nhắn gần đây</Text>}
         <ScrollView style={styles.chatList} showsVerticalScrollIndicator={false}>
           {chatList?.map((item, index) => {

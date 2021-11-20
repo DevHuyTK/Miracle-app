@@ -77,7 +77,7 @@ export default function Post({ post, onNavigation, userData, token }) {
   };
 
   return (
-    <View style={{ marginVertical: 10, backgroundColor: '#fff', width: width }}>
+    <View style={{ marginVertical: 10, backgroundColor: '#fff', width: width, elevation: 15 }}>
       <View style={styles.header}>
         <View>
           <TouchableOpacity
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     color: '#3c3c3c',
   },
   caption: {
-    padding: 16,
+    padding: 14,
   },
   footer: {
     margin: 6,
