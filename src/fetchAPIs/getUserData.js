@@ -1,8 +1,8 @@
-import { DOMAIN } from '../store/constant';
+import { DOMAIN, LIMIT } from '../store/constant';
 
-export default function callAPI(token) {
+export default function callAPI(token, pageIndex) {
   return new Promise((resolve, reject) => {
-    const url = `${DOMAIN}/api/photo/photo-user`;
+    const url = `${DOMAIN}/api/photo/photo-user?limit=${LIMIT}&page=${pageIndex}`;
     fetch(url, {
       method: 'GET',
       headers: {

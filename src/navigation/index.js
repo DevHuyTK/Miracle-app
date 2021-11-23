@@ -19,6 +19,7 @@ import ChangePassword from '../screens/Account/ChangePassword';
 import ChangeAvatar from '../screens/Account/ChangeAvatar';
 import AvatarScreen from '../screens/Account/AvatarScreen';
 import YourScreen from '../screens/Account/YourScreen';
+import CommentInteract from '../screens/UserInteract/CommentInteract';
 
 const Stack = createStackNavigator();
 
@@ -91,6 +92,7 @@ export default function Navigation() {
         <Stack.Screen name="YourScreen" component={YourScreen} />
         <Stack.Screen name="ChatBox" component={ChatBox} />
         <Stack.Screen name="SearchChat" component={SearchChat} />
+        <Stack.Screen name="CommentInteract" component={CommentInteract} />
       </Stack.Navigator>
     </NavigationContainer>
   );

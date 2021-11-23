@@ -1,30 +1,37 @@
 import React, { useEffect, useState } from 'react';
-import { View, FlatList, Text } from 'react-native';
+import { View, FlatList, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import Post from '../../Components/Post';
 import YourHeaderInfo from '../../Components/Profile/YourHeaderInfo';
 import LottieView from 'lottie-react-native';
-import { DOMAIN } from '../../store/constant';
+import { DOMAIN, LIMIT } from '../../store/constant';
 
 function YourScreen({ navigation, route }) {
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const { data, token, posts_userId, user } = route.params;
+  const [pageIndex, setPageIndex] = useState(1);
 
   useEffect(() => {
-    setIsLoading(true);
-    fetch(`${DOMAIN}/api/photo/photo-targetuser?userId=${posts_userId}`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((response) => response.json())
-      .then(async (res) => {
-        setPosts(res.data);
-        setIsLoading(false);
-      });
+    handleGetData();
   }, []);
 
+  const handleGetData = async () => {
+    setIsLoading(true);
+    fetch(
+      `${DOMAIN}/api/photo/photo-targetuser?userId=${posts_userId}&limit=${LIMIT}&page=${pageIndex}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    )
+      .then((response) => response.json())
+      .then(async (res) => {
+        setPosts((posts) => [...posts, ...res.data]);
+        setIsLoading(false);
+      });
+  };
 
   const renderHeader = (loginData) => (
     <View
@@ -41,6 +48,16 @@ function YourScreen({ navigation, route }) {
       <Text>{loginData.description}</Text>
     </View>
   );
+
+  const renderFooter = () => {
+    {
+      isLoading ? (
+        <View style={styles.loader}>
+          <ActivityIndicator size="large" color="#00ff00" />
+        </View>
+      ) : null;
+    }
+  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -67,14 +84,28 @@ function YourScreen({ navigation, route }) {
           <FlatList
             data={posts}
             keyExtractor={(item) => item._id}
-            renderItem={({ item }) => <Post post={item} />}
+            renderItem={({ item }) => <Post post={item} userData={user} token={token} />}
             showsVerticalScrollIndicator={false}
             ListHeaderComponent={renderHeader(data)}
+            onEndReached={() => {
+              setPageIndex(pageIndex + 1);
+              handleGetData();
+            }}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={renderFooter()}
           />
         )}
       </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  loader: {
+    marginTop: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
 
 export default YourScreen;

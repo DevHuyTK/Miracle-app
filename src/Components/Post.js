@@ -11,10 +11,17 @@ const { width } = Dimensions.get('window');
 export default function Post({ post, onNavigation, userData, token }) {
   const [isLiked, setIsLike] = useState(false);
   const [likesCount, setLikesCount] = useState(post.like_count?.length);
+  const [commentCount, setCommentCount] = useState(post.comments?.length);
   const socket = socketIOClient(DOMAIN);
+  const [tokenUser, setTokenUser] = useState('');
 
   useEffect(() => {
-    userIsLike();
+    async function getToken() {
+      const token = await AsyncStorage.getItem('token');
+      setTokenUser(token);
+      userIsLike();
+    }
+    getToken();
   }, []);
 
   const userIsLike = async () => {
@@ -125,11 +132,15 @@ export default function Post({ post, onNavigation, userData, token }) {
             type="font-awesome"
             color="#267ea6"
           />
-          <Text style={{ marginLeft: 6, fontSize: 16 }}>{likesCount} người đã thích</Text>
         </TouchableOpacity>
-        <View style={styles.postAgo}>
-          <Text style={{ fontSize: 16, color: 'gray' }}>{post?.postAgo}</Text>
-        </View>
+        <TouchableOpacity style={styles.likeIcons} onPress={() => onCommentClick()}>
+          <Icon size={30} name={'comments'} type="font-awesome" color="#267ea6" />
+        </TouchableOpacity>
+      </View>
+      <View style={styles.countNumber}>
+        {/* <Text style={{ fontSize: 16, color: 'gray' }}>{post?.postAgo}</Text> */}
+        <Text style={{ marginLeft: 6, fontSize: 16 }}>{likesCount} người đã thích</Text>
+        <Text style={{ marginLeft: 6, fontSize: 16 }}>{commentCount} người đã bình luận</Text>
       </View>
     </View>
   );
@@ -161,15 +172,23 @@ const styles = StyleSheet.create({
   },
   footer: {
     margin: 6,
+    flexDirection: 'row',
   },
   likeIcons: {
     flexDirection: 'row',
     paddingLeft: 6,
+    paddingRight: 10,
     alignItems: 'center',
   },
   postAgo: {
     paddingLeft: 6,
     paddingTop: 5,
     justifyContent: 'center',
+  },
+  countNumber: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
   },
 });
