@@ -10,6 +10,7 @@ import {
   getMatchingListAccount,
 } from '../../../store/Actions/AccountActions';
 import LottieView from 'lottie-react-native';
+import { DOMAIN, LIMIT } from '../../../store/constant';
 
 function Personal({ ...props }) {
   const [refreshing, setRefreshing] = useState(false);
@@ -17,6 +18,7 @@ function Personal({ ...props }) {
   const [userNewFeed, setUserNewFeed] = useState([]);
   const [userInfo, setUserInfo] = useState([]);
   const [pageIndex, setPageIndex] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     async function getToken() {
@@ -57,6 +59,49 @@ function Personal({ ...props }) {
     setUserNewFeed((userNewFeed) => [...userNewFeed, ...props.usernewfeed]);
   };
 
+  const handleGetPagination = async (pageIndex, token) => {
+    console.log('pageIndex', pageIndex);
+    setIsLoading(true);
+    setPageIndex(pageIndex);
+    const url = `${DOMAIN}/api/photo/photo-user?limit=${LIMIT}&page=${pageIndex}`;
+    fetch(url, {
+      method: 'GET',
+      headers: {
+        Authorization: 'Bearer ' + token,
+      },
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        setUserNewFeed([...userNewFeed, ...res.data]);
+        setIsLoading(false);
+      });
+  };
+
+  const renderFooter = () => {
+    {
+      isLoading ? (
+        <View
+          style={{
+            marginTop: 10,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <LottieView
+            autoPlay
+            loop
+            speed={0.6}
+            style={{
+              height: 100,
+              alignSelf: 'center',
+            }}
+            source={require('../../../../assets/Animations/8311-loading.json')}
+          />
+        </View>
+      ) : null;
+    }
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <Header onNavigation={props.navigation} />
@@ -80,9 +125,10 @@ function Personal({ ...props }) {
             showsVerticalScrollIndicator={false}
             ListHeaderComponent={renderHeader(userInfo)}
             onEndReached={() => {
-              handleGetData();
+              handleGetPagination(pageIndex + 1, token);
             }}
             onEndReachedThreshold={0.5}
+            ListFooterComponent={renderFooter()}
           />
         ) : (
           <LottieView

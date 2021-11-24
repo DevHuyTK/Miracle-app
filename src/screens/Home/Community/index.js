@@ -18,6 +18,7 @@ import {
   getMatchingListAccount,
 } from '../../../store/Actions/AccountActions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { DOMAIN, LIMIT } from '../../../store/constant';
 
 function Community({ navigation, ...props }) {
   const [token, setToken] = useState('');
@@ -25,7 +26,7 @@ function Community({ navigation, ...props }) {
   const [userInfo, setUserInfo] = useState([]);
   const [newFeed, setNewFeed] = useState([]);
   const [pageIndex, setPageIndex] = useState(1);
-  const [isLoading, setILoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     async function getUserInfo() {
@@ -45,10 +46,22 @@ function Community({ navigation, ...props }) {
     setTimeout(() => setRefreshing(false), 2000);
   };
 
-  const handleGetData = async () => {
-    setPageIndex(pageIndex + 1);
-    props.getNewFeed({ token, pageIndex });
-    setNewFeed((newFeed) => [...newFeed, ...props.newfeed]);
+  const handleGetPagination = async (pageIndex, token) => {
+    console.log('pageIndex', pageIndex);
+    setIsLoading(true);
+    setPageIndex(pageIndex);
+    const url = `${DOMAIN}/api/photo?limit=${LIMIT}&page=${pageIndex}&`;
+    fetch(url, {
+      method: 'GET',
+      headers: {
+        Authorization: 'Bearer ' + token,
+      },
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        setNewFeed([...newFeed, ...res.data]);
+        setIsLoading(false);
+      });
   };
 
   const renderFooter = () => {
@@ -97,8 +110,8 @@ function Community({ navigation, ...props }) {
             )}
             showsVerticalScrollIndicator={false}
             ListHeaderComponent={<Newfeeds onNavigation={navigation} userData={userInfo} />}
-            onEndReached={() => {
-              handleGetData();
+            onEndReached={async () => {
+              handleGetPagination(pageIndex + 1, token);
             }}
             onEndReachedThreshold={0.5}
             ListFooterComponent={renderFooter()}
