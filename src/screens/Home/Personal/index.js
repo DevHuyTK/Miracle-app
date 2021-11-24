@@ -75,7 +75,7 @@ function Personal({ ...props }) {
               />
             }
             renderItem={({ item }) => (
-              <Post post={item} post={item} userData={userInfo} token={token} />
+              <Post post={item} post={item} onNavigation={props.navigation} userData={userInfo} token={token} />
             )}
             showsVerticalScrollIndicator={false}
             ListHeaderComponent={renderHeader(userInfo)}

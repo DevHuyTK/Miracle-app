@@ -133,7 +133,7 @@ export default function Post({ post, onNavigation, userData, token }) {
             color="#267ea6"
           />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.likeIcons} onPress={() => onCommentClick()}>
+        <TouchableOpacity style={styles.likeIcons} onPress={() => onNavigation.navigate('CommentInteract')}>
           <Icon size={30} name={'comments'} type="font-awesome" color="#267ea6" />
         </TouchableOpacity>
       </View>
@@ -173,6 +173,7 @@ const styles = StyleSheet.create({
   footer: {
     margin: 6,
     flexDirection: 'row',
+    justifyContent: 'space-around',
   },
   likeIcons: {
     flexDirection: 'row',
@@ -187,7 +188,7 @@ const styles = StyleSheet.create({
   },
   countNumber: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
     alignItems: 'center',
     marginBottom: 10,
   },
