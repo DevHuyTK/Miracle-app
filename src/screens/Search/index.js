@@ -48,7 +48,7 @@ function Search({ navigation, ...props }) {
     if (!e || e === '') {
       setSearchData([]);
       setText(text);
-    } else if (!Array.isArray(filteredName) && !filteredName.length) {
+    } else if (!Array.isArray(filteredName)) {
       setSearchData([]);
       setText(text);
     } else if (Array.isArray(filteredName)) {
