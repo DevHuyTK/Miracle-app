@@ -32,25 +32,25 @@ const ChatBox = ({ navigation, route }) => {
       // console.log('a');
     });
     socket.on('send-message-response', (data) => {
-      // console.log(data);
-      // console.log('send-message-response');
-      setMessage('');
       setLoading(false);
       setChatList((prevState) => [...prevState, data.data]);
     });
   }, []);
 
   const handleOnPress = () => {
-    setLoading(true);
-    socket.emit('join', {
-      token: token,
-      userIds: [data.user_id],
-    });
-    socket.emit('send-message', {
-      token: token,
-      userId: data.user_id,
-      message: message,
-    });
+    if (message.trim().length > 0) {
+      setLoading(true);
+      socket.emit('join', {
+        token: token,
+        userIds: [data.user_id],
+      });
+      socket.emit('send-message', {
+        token: token,
+        userId: data.user_id,
+        message: message,
+      });
+      setMessage('');
+    }
   };
 
   return (

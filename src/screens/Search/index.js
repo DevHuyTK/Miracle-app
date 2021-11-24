@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = (state) => ({
-  user_info: state.user_info,
+  user_info: state.account.user_info,
 });
 
 export default Search = connect(mapStateToProps)(Search);

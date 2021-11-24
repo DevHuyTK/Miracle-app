@@ -22,6 +22,7 @@ import { connect } from 'react-redux';
 import {
   getMatchingListAccount,
   getAllAccount,
+  getAccountNewFeed,
 } from '../../../store/Actions/AccountActions';
 import LottieView from 'lottie-react-native';
 
@@ -29,7 +30,7 @@ const img = require('../../../../assets/Miracle.png');
 
 //This's what u see (_ _")
 function Login({ navigation, ...props }) {
-  const [userName, serUserName] = useState('');
+  const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState('');
@@ -72,12 +73,13 @@ function Login({ navigation, ...props }) {
         if (res.status === 1) {
           await AsyncStorage.setItem('token', res.token);
           await props.getMatchingList(res.token);
-          props.getAllUser();
-          navigation.navigate('Home');
-          setLoading(false);
+          await props.getNewFeed({ token: res.token, pageIndex: 1 });
+          await props.getAllUser();
+          setTimeout(() => {
+            navigation.navigate('Home'), setLoading(false), setUserName(''), setPassword('');
+          }, 2000);
+          Keyboard.dismiss();
           setStatus('');
-          serUserName('');
-          setPassword('');
         } else {
           setStatus(res.message);
           setModelVisible(true);
@@ -88,7 +90,7 @@ function Login({ navigation, ...props }) {
       });
   };
   const handleOnChangeUserName = (value) => {
-    serUserName(value);
+    setUserName(value);
   };
 
   const handleOnChangePassword = (value) => {
@@ -168,6 +170,9 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
+    getNewFeed: (data) => {
+      dispatch(getAccountNewFeed(data));
+    },
     getMatchingList: (data) => {
       dispatch(getMatchingListAccount(data));
     },

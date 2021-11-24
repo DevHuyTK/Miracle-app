@@ -1,13 +1,13 @@
 import { put, takeEvery } from 'redux-saga/effects';
 import * as types from '../constant';
-import getNewFeed from '../../fetchAPIs/getNewFeed'
-import getUserNewFeed from '../../fetchAPIs/getUserData'
-import getAllUser from '../../fetchAPIs/getAllUser'
-import getMatchingList from '../../fetchAPIs/getMatchingList'
+import getNewFeed from '../../fetchAPIs/getNewFeed';
+import getUserNewFeed from '../../fetchAPIs/getUserData';
+import getAllUser from '../../fetchAPIs/getAllUser';
+import getMatchingList from '../../fetchAPIs/getMatchingList';
 
 function* getAllNewFeed(action) {
   try {
-    const res = yield getNewFeed(action.payload);
+    const res = yield getNewFeed(action.payload.token, action.payload.pageIndex);
     yield put({
       type: types.GET_NEWFEED_SUCCESS,
       payload: {
@@ -25,7 +25,7 @@ function* getAllNewFeed(action) {
 }
 function* getNewFeedUser(action) {
   try {
-    const res = yield getUserNewFeed(action.payload);
+    const res = yield getUserNewFeed(action.payload.token, action.payload.pageIndex);
     yield put({
       type: types.GET_USER_NEWFEED_SUCCESS,
       payload: {
@@ -78,10 +78,9 @@ function* getMatchingListAccount(action) {
   }
 }
 
-
 export const AccountSaga = [
   takeEvery(types.GET_NEWFEED_REQUEST, getAllNewFeed),
   takeEvery(types.GET_USER_NEWFEED_REQUEST, getNewFeedUser),
   takeEvery(types.GET_ALL_USER_REQUEST, getAllAccount),
-  takeEvery(types.GET_MATCHING_LIST_REQUEST, getMatchingListAccount)
+  takeEvery(types.GET_MATCHING_LIST_REQUEST, getMatchingListAccount),
 ];

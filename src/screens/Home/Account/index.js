@@ -82,7 +82,9 @@ function Account({ navigation, ...props }) {
             )}
           </View>
           <View style={{ width: '65%', justifyContent: 'center' }}>
-            <Text style={{ fontWeight: 'bold', fontSize: 26 }}>{props.user_info?.full_name}</Text>
+            <Text style={{ fontWeight: 'bold', fontSize: 26 }}>
+              {props.user_info?.full_name ? props.user_info.full_name : props.user_info.username}
+            </Text>
             <Text style={{ fontSize: 15 }}>{props.user_info?.email}</Text>
           </View>
         </TouchableOpacity>
@@ -142,6 +144,5 @@ function Account({ navigation, ...props }) {
 const mapStateToProps = (state) => ({
   user_info: state.account.user_info,
 });
-
 
 export default connect(mapStateToProps)(Account);

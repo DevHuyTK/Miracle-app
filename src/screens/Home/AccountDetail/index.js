@@ -87,7 +87,6 @@ function accDetail({ navigation, ...props }) {
           await props.getMatchingList(token);
           await navigation.navigate('Account');
           setLoading(false);
-          setIsChanged(!isChanged);
         } else {
           setStatus(res.message);
           await Alert.alert(res.message);
@@ -259,26 +258,7 @@ function accDetail({ navigation, ...props }) {
           </View>
         </View>
         <Text style={styles.titleSetting}></Text>
-        <TouchableOpacity
-          style={styles.settingBox}
-          onPress={async () => {
-            navigation.navigate('ChangePassword');
-          }}
-        >
-          <View style={styles.settingItem}>
-            <Text
-              style={{
-                fontSize: 17,
-                lineHeight: 50,
-                textAlign: 'center',
-                width: '100%',
-              }}
-            >
-              Đổi mật khẩu
-            </Text>
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.settingBox} onPress={handleUpdateInfo}>
+        <TouchableOpacity style={styles.settingBox} onPress={() => handleUpdateInfo()}>
           {loading ? (
             <ActivityIndicator size={35} color="#000" />
           ) : (
