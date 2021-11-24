@@ -133,7 +133,16 @@ export default function Post({ post, onNavigation, userData, token }) {
             color="#267ea6"
           />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.likeIcons} onPress={() => onNavigation.navigate('CommentInteract')}>
+        <TouchableOpacity
+          style={styles.likeIcons}
+          onPress={() =>
+            onNavigation.navigate('CommentInteract', {
+              token,
+              postId: post._id,
+              userData: userData,
+            })
+          }
+        >
           <Icon size={30} name={'comments'} type="font-awesome" color="#267ea6" />
         </TouchableOpacity>
       </View>

@@ -8,15 +8,19 @@ import { DOMAIN, LIMIT } from '../../store/constant';
 function YourScreen({ navigation, route }) {
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
   const { data, token, posts_userId, user } = route.params;
   const [pageIndex, setPageIndex] = useState(1);
 
   useEffect(() => {
-    handleGetData();
+    setIsLoading(true);
+    handleGetData(1);
+    setIsLoading(false);
   }, []);
 
-  const handleGetData = async () => {
-    setIsLoading(true);
+  const handleGetData = async (pageIndex) => {
+    setIsFetching(true);
+    setPageIndex(pageIndex);
     fetch(
       `${DOMAIN}/api/photo/photo-targetuser?userId=${posts_userId}&limit=${LIMIT}&page=${pageIndex}`,
       {
@@ -28,8 +32,8 @@ function YourScreen({ navigation, route }) {
     )
       .then((response) => response.json())
       .then(async (res) => {
-        setPosts((posts) => [...posts, ...res.data]);
-        setIsLoading(false);
+        setPosts([...posts, ...res.data]);
+        setIsFetching(false);
       });
   };
 
@@ -51,7 +55,7 @@ function YourScreen({ navigation, route }) {
 
   const renderFooter = () => {
     {
-      isLoading ? (
+      isFetching ? (
         <View style={styles.loader}>
           <ActivityIndicator size="large" color="#00ff00" />
         </View>
@@ -83,13 +87,12 @@ function YourScreen({ navigation, route }) {
         ) : (
           <FlatList
             data={posts}
-            keyExtractor={(item) => item._id}
-            renderItem={({ item }) => <Post post={item} userData={user} token={token} />}
+            keyExtractor={(item, index) => String(index)}
+            renderItem={({ item }) => <Post onNavigation={navigation} post={item} userData={user} token={token} />}
             showsVerticalScrollIndicator={false}
             ListHeaderComponent={renderHeader(data)}
             onEndReached={() => {
-              setPageIndex(pageIndex + 1);
-              handleGetData();
+              handleGetData(pageIndex + 1);
             }}
             onEndReachedThreshold={0.5}
             ListFooterComponent={renderFooter()}
@@ -108,4 +111,9 @@ const styles = StyleSheet.create({
   },
 });
 
-export default YourScreen;
+export default React.memo(YourScreen, (state, nextState) => {
+  if (state.posts !== nextState.posts) {
+    return false;
+  }
+  return true;
+});
