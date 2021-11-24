@@ -1,4 +1,4 @@
-import { StyleSheet, FlatList, View, Text, SafeAreaView } from 'react-native';
+import { StyleSheet, FlatList, View, Text, SafeAreaView, KeyboardAvoidingView } from 'react-native';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 import React, { useEffect, useState, useRef } from 'react';
 import ChatBoxTitle from '../../../Components/Chat/ChatBoxTitle';
@@ -55,13 +55,16 @@ const ChatBox = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <View
+      <KeyboardAvoidingView
         style={{
           backgroundColor: '#fff',
           marginTop: getStatusBarHeight(),
           justifyContent: 'center',
           alignItems: 'center',
+          flex: 1,
+          paddingBottom: 20,
         }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <ChatBoxTitle
           title={'Sửa thông tin'}
@@ -94,7 +97,7 @@ const ChatBox = ({ navigation, route }) => {
           onPress={() => handleOnPress()}
           onChange={(value) => setMessage(value)}
         />
-      </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
