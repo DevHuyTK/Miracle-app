@@ -82,6 +82,9 @@ export default function CommentInteract({ navigation, route }) {
   };
 
   return (
+    <SafeAreaView
+      style={styles.container}
+    >
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
@@ -89,7 +92,7 @@ export default function CommentInteract({ navigation, route }) {
       <SafeAreaView
         style={{
           flexDirection: 'row',
-          height: '8%',
+          height: '10%',
           backgroundColor: '#fff',
           borderBottomWidth: 1,
           paddingVertical: 5,
@@ -123,7 +126,7 @@ export default function CommentInteract({ navigation, route }) {
           data={commentList}
           keyExtractor={(item, index) => String(index)}
           ref={scrollView}
-          style={{ paddingHorizontal: 15, paddingVertical: 5, height: '84%', width: '100%' }}
+          style={{ paddingHorizontal: 15, paddingVertical: 5, height: '80%', width: '100%' }}
           renderItem={({ item }) => <CommentLine data={item} onNavigation={navigation} />}
           showsVerticalScrollIndicator={false}
           onContentSizeChange={() => scrollView.current.scrollToEnd({ animated: true })}
@@ -169,6 +172,7 @@ export default function CommentInteract({ navigation, route }) {
         </View>
       )}
     </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
@@ -188,7 +192,7 @@ const styles = StyleSheet.create({
   commentInputBar: {
     paddingHorizontal: 5,
     flexDirection: 'row',
-    height: '8%',
+    height: '10%',
     alignItems: 'center',
     borderTopWidth: 1,
     borderTopColor: '#000',

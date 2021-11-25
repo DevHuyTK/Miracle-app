@@ -21,7 +21,6 @@ function ImagesGrid(props) {
   const deleteHandle = (index) => {
     var delImage = props.imageGrid.splice(index, 1);
     var newImages = props.imageGrid.filter((item) => item !== delImage);
-    console.log(props.imageGrid);
     props.setImageGrid(newImages);
   };
 
@@ -42,8 +41,7 @@ function ImagesGrid(props) {
   };
 
   const renderTwo = () => {
-    const conditionalRender =
-      [3, 4].includes(props.imageGrid.length) || (props.imageGrid.length > +countFrom && [3, 4].includes(+countFrom));
+    const conditionalRender = [3, 4].includes(props.imageGrid.length);
 
     return (
       <View style={styles.row}>
@@ -92,9 +90,15 @@ function ImagesGrid(props) {
           style={[styles.imageContent, styles.imageContent1]}
           onPress={() => clickEventListener()}
         >
-          <Image style={styles.image} source={{ uri: props.imageGrid[props.imageGrid.length - 1] }} />
+          <Image
+            style={styles.image}
+            source={{ uri: props.imageGrid[props.imageGrid.length - 1] }}
+          />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.delButton} onPress={() => deleteHandle(props.imageGrid.length - 1)}>
+        <TouchableOpacity
+          style={styles.delButton}
+          onPress={() => deleteHandle(props.imageGrid.length - 1)}
+        >
           <Feather name="x-circle" color="gray" size={width / 12} style={{ opacity: 0.8 }} />
         </TouchableOpacity>
       </View>
@@ -102,9 +106,8 @@ function ImagesGrid(props) {
   };
 
   const renderCountOverlay = (more) => {
-    const extra = props.imageGrid.length - (countFrom && countFrom > 5 ? 5 : countFrom);
-    const conditionalRender =
-    props.imageGrid.length == 4 || (props.imageGrid.length > +countFrom && +countFrom == 4);
+    const extra = props.imageGrid.length - countFrom;
+    const conditionalRender = countFrom == 4;
     return (
       <TouchableOpacity
         style={[styles.imageContent, styles.imageContent2]}
@@ -125,11 +128,11 @@ function ImagesGrid(props) {
 
   const renderThree = () => {
     const overlay =
-      !countFrom || countFrom > 5 || (props.imageGrid.length > countFrom && [4, 5].includes(+countFrom))
+      props.imageGrid.length > countFrom && [4, 5].includes(+countFrom)
         ? renderCountOverlay(true)
         : renderOverlay();
     const conditionalRender =
-    props.imageGrid.length == 4 || (props.imageGrid.length > +countFrom && +countFrom == 4);
+      props.imageGrid.length == 4 || (props.imageGrid.length > +countFrom && +countFrom == 4);
 
     return (
       <View style={styles.row}>
@@ -189,7 +192,7 @@ const mapDispatchToProps = (dispatch) => {
   return {
     setImageGrid: (payload) => {
       dispatch(setImage(payload));
-    }
+    },
   };
 };
 
