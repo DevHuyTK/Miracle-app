@@ -107,9 +107,9 @@ function Personal({ ...props }) {
       <Header onNavigation={props.navigation} />
       <HeaderInfo totalData={userNewFeed} navigation={props.navigation} user_info={userInfo} />
       <View style={{ flex: 2 }}>
-        {userNewFeed && userInfo !== [] ? (
+        {userInfo !== [] ? (
           <FlatList
-            data={userNewFeed}
+            data={userNewFeed?.sort((a, b) => a.created_at.localeCompare(b.created_at))}
             keyExtractor={(item, index) => String(index)}
             refreshControl={
               <RefreshControl
@@ -120,7 +120,14 @@ function Personal({ ...props }) {
               />
             }
             renderItem={({ item }) => (
-              <Post post={item} post={item} onNavigation={props.navigation} userData={userInfo} token={token} />
+              <Post
+                post={item}
+                post={item}
+                onNavigation={props.navigation}
+                userData={userInfo}
+                token={token}
+                commentTotal={props.commentList}
+              />
             )}
             showsVerticalScrollIndicator={false}
             ListHeaderComponent={renderHeader(userInfo)}
@@ -150,9 +157,10 @@ function Personal({ ...props }) {
 const mapStateToProps = (state) => ({
   usernewfeed: state.account.usernewfeed,
   user_info: state.account.user_info,
+  commentList: state.comment.commentList,
 });
 
-mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch) => ({
   getUserNewFeed: (data) => {
     dispatch(getAccountUserNewFeed(data));
   },

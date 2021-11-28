@@ -21,8 +21,11 @@ import CommentLine from '../../Components/CommentLine';
 import socketIOClient from 'socket.io-client';
 import { DOMAIN } from '../../store/constant';
 import LottieView from 'lottie-react-native';
+import { connect } from 'react-redux';
+import { setComment } from './../../store/Actions/CommentActions';
+import { getAccountNewFeed } from './../../store/Actions/AccountActions';
 
-export default function CommentInteract({ navigation, route }) {
+function CommentInteract({ navigation, route, ...props }) {
   const scrollView = useRef();
   const socket = socketIOClient(DOMAIN);
   const { token, postId, userData } = route.params;
@@ -44,8 +47,6 @@ export default function CommentInteract({ navigation, route }) {
     });
   }, []);
 
-  // console.log(commentList);
-
   const handleOnPress = () => {
     if (comment.trim().length > 0) {
       setIsLoading(true);
@@ -55,6 +56,7 @@ export default function CommentInteract({ navigation, route }) {
         comment,
       });
       setComment('');
+      props.setTotalComment({ postId, commentTotal: props.commentList.commentTotal + 1 });
     } else {
       Alert.alert('Bạn chưa nhập bình luận');
     }
@@ -73,6 +75,7 @@ export default function CommentInteract({ navigation, route }) {
       .then((response) => response.json())
       .then((res) => {
         setCommentList(res.data.comments);
+        props.setTotalComment({ postId, commentTotal: res.data.comments.length });
         setIsFetching(false);
       })
       .catch((err) => {
@@ -82,99 +85,106 @@ export default function CommentInteract({ navigation, route }) {
   };
 
   return (
-    <SafeAreaView
-      style={styles.container}
-    >
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
-    >
-      <SafeAreaView
-        style={{
-          flexDirection: 'row',
-          height: '10%',
-          backgroundColor: '#fff',
-          borderBottomWidth: 1,
-          paddingVertical: 5,
-        }}
+    <SafeAreaView style={styles.container}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.container}
       >
-        <View style={{ width: '15%', justifyContent: 'center', alignItems: 'center' }}>
-          <TouchableHighlight
-            underlayColor="#999"
-            activeOpacity={0.5}
-            style={styles.btnBack}
-            onPress={() => navigation.goBack()}
-          >
-            <MaterialIcons name="chevron-left" color="black" size={30} />
-          </TouchableHighlight>
-        </View>
-        <Text style={{ fontSize: 20, paddingLeft: 6, alignSelf: 'center' }}>Bình luận</Text>
-      </SafeAreaView>
-      {isFetching ? (
-        <LottieView
-          autoPlay
-          loop
-          speed={0.6}
+        <SafeAreaView
           style={{
-            height: 100,
-            alignSelf: 'center',
+            flexDirection: 'row',
+            height: '10%',
+            backgroundColor: '#fff',
+            borderBottomWidth: 1,
+            paddingVertical: 5,
           }}
-          source={require('../../../assets/Animations/8311-loading.json')}
-        />
-      ) : (
-        <FlatList
-          data={commentList}
-          keyExtractor={(item, index) => String(index)}
-          ref={scrollView}
-          style={{ paddingHorizontal: 15, paddingVertical: 5, height: '80%', width: '100%' }}
-          renderItem={({ item }) => <CommentLine data={item} onNavigation={navigation} />}
-          showsVerticalScrollIndicator={false}
-          onContentSizeChange={() => scrollView.current.scrollToEnd({ animated: true })}
-        />
-      )}
-      <View style={styles.commentInputBar}>
-        {userData?.avatar ? (
-          <Avatar
-            size="medium"
-            rounded
-            source={{
-              uri: `${DOMAIN}/${userData?.avatar}`,
+        >
+          <View style={{ width: '15%', justifyContent: 'center', alignItems: 'center' }}>
+            <TouchableHighlight
+              underlayColor="#999"
+              activeOpacity={0.5}
+              style={styles.btnBack}
+              onPress={() => navigation.goBack()}
+            >
+              <MaterialIcons name="chevron-left" color="black" size={30} />
+            </TouchableHighlight>
+          </View>
+          <Text style={{ fontSize: 20, paddingLeft: 6, alignSelf: 'center' }}>Bình luận</Text>
+        </SafeAreaView>
+        {isFetching ? (
+          <LottieView
+            autoPlay
+            loop
+            speed={0.6}
+            style={{
+              height: 100,
+              alignSelf: 'center',
             }}
+            source={require('../../../assets/Animations/8311-loading.json')}
           />
         ) : (
-          <Avatar
-            size="medium"
-            rounded
-            icon={{ name: 'user', type: 'font-awesome' }}
-            containerStyle={{ backgroundColor: 'gray' }}
+          <FlatList
+            data={commentList}
+            keyExtractor={(item, index) => String(index)}
+            ref={scrollView}
+            style={{ paddingHorizontal: 15, paddingVertical: 5, height: '80%', width: '100%' }}
+            renderItem={({ item }) => <CommentLine data={item} onNavigation={navigation} />}
+            showsVerticalScrollIndicator={false}
+            onContentSizeChange={() => scrollView.current.scrollToEnd({ animated: true })}
           />
         )}
-        <TextInput
-          multiline={true}
-          scrollEnabled={true}
-          placeholder="Hãy Viết gì đó"
-          style={styles.input}
-          value={comment}
-          onChangeText={(text) => setComment(text)}
-        />
-        <TouchableOpacity style={styles.iconInput} onPress={() => handleOnPress()}>
-          {isLoading ? (
-            <ActivityIndicator size={30} color="#000" style={styles.loading} />
+        <View style={styles.commentInputBar}>
+          {userData?.avatar ? (
+            <Avatar
+              size="medium"
+              rounded
+              source={{
+                uri: `${DOMAIN}/${userData?.avatar}`,
+              }}
+            />
           ) : (
-            <Icon size={36} name="send" type="Ionicons" color="#2acaea" />
+            <Avatar
+              size="medium"
+              rounded
+              icon={{ name: 'user', type: 'font-awesome' }}
+              containerStyle={{ backgroundColor: 'gray' }}
+            />
           )}
-        </TouchableOpacity>
-      </View>
-
-      {commentList?.length === 0 && (
-        <View>
-          <Text style={styles.noneComment}>Chưa có bình luận nào</Text>
+          <TextInput
+            multiline={true}
+            scrollEnabled={true}
+            placeholder="Hãy Viết gì đó"
+            style={styles.input}
+            value={comment}
+            onChangeText={(text) => setComment(text)}
+          />
+          <TouchableOpacity style={styles.iconInput} onPress={() => handleOnPress()}>
+            {isLoading ? (
+              <ActivityIndicator size={30} color="#000" style={styles.loading} />
+            ) : (
+              <Icon size={36} name="send" type="Ionicons" color="#2acaea" />
+            )}
+          </TouchableOpacity>
         </View>
-      )}
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
+
+const mapStateToProps = (state) => ({
+  commentList: state.comment.commentList,
+});
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    setTotalComment: (payload) => {
+      dispatch(setComment(payload));
+    },
+    getNewFeed: (data) => {
+      dispatch(getAccountNewFeed(data));
+    },
+  };
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -217,3 +227,5 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
 });
+
+export default connect(mapStateToProps, mapDispatchToProps)(CommentInteract);

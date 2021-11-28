@@ -32,12 +32,15 @@ function Community({ navigation, ...props }) {
     async function getUserInfo() {
       const token = await AsyncStorage.getItem('token');
       setToken(token);
-      setUserInfo(props.user_info);
-      setNewFeed(props.newfeed);
       props.getUserNewFeed({ token, pageIndex: 1 });
     }
     getUserInfo();
   }, []);
+
+  useEffect(() => {
+    setUserInfo(props.user_info);
+    setNewFeed(props.newfeed);
+  }, [props.user_info, props.newfeed]);
 
   const doRefresh = async () => {
     setPageIndex(1);
@@ -47,7 +50,6 @@ function Community({ navigation, ...props }) {
   };
 
   const handleGetPagination = async (pageIndex, token) => {
-    console.log('pageIndex', pageIndex);
     setIsLoading(true);
     setPageIndex(pageIndex);
     const url = `${DOMAIN}/api/photo?limit=${LIMIT}&page=${pageIndex}&`;
@@ -95,7 +97,7 @@ function Community({ navigation, ...props }) {
       <SafeAreaView style={{ flex: 2 }}>
         {userInfo !== [] ? (
           <FlatList
-            data={newFeed}
+            data={newFeed?.sort((a, b) => a.created_at.localeCompare(b.created_at))}
             keyExtractor={(item, index) => String(index)}
             refreshControl={
               <RefreshControl
@@ -106,7 +108,13 @@ function Community({ navigation, ...props }) {
               />
             }
             renderItem={({ item }) => (
-              <Post onNavigation={navigation} post={item} userData={userInfo} token={token} />
+              <Post
+                onNavigation={navigation}
+                post={item}
+                userData={userInfo}
+                token={token}
+                commentTotal={props.commentList}
+              />
             )}
             showsVerticalScrollIndicator={false}
             ListHeaderComponent={<Newfeeds onNavigation={navigation} userData={userInfo} />}
@@ -136,6 +144,7 @@ function Community({ navigation, ...props }) {
 const mapStateToProps = (state) => ({
   newfeed: state.account.newfeed,
   user_info: state.account.user_info,
+  commentList: state.comment.commentList,
 });
 
 const mapDispatchToProps = (dispatch) => ({
