@@ -17,8 +17,12 @@ function YourHeaderInfo({ navigation, token, userData, posts, ...props }) {
     userFollowIsValid();
   }, []);
 
+  useEffect(() => {
+    props.getMatchingList(token);
+  }, [props.user_info]);
+
   const userFollowIsValid = async () => {
-    if (props.user_info?.following_list.find((item) => item.user_id.toString() == userData._id)) {
+    if (props?.user_info?.following_list.find((item) => item.user_id.toString() == userData._id)) {
       return setIsValid(true);
     } else {
       return setIsValid(false);
@@ -32,7 +36,6 @@ function YourHeaderInfo({ navigation, token, userData, posts, ...props }) {
       handleFollow(user);
     }
     setIsValid(!isValid);
-    props.getMatchingList(token);
   };
 
   const handleFollow = async (user) => {
@@ -53,10 +56,9 @@ function YourHeaderInfo({ navigation, token, userData, posts, ...props }) {
     //   console.log(user, 'a');
     // });
   };
-  
 
   const handleOnPress = async (item) => {
-    fetch(`${DOMAIN}/api/chat/${item.user_id}`, {
+    fetch(`${DOMAIN}/api/chat/${item._id}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,

@@ -4,8 +4,9 @@ import Post from '../../Components/Post';
 import YourHeaderInfo from '../../Components/Profile/YourHeaderInfo';
 import LottieView from 'lottie-react-native';
 import { DOMAIN, LIMIT } from '../../store/constant';
+import { connect } from 'react-redux';
 
-function YourScreen({ navigation, route }) {
+function YourScreen({ navigation, route, ...props }) {
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
@@ -86,9 +87,17 @@ function YourScreen({ navigation, route }) {
           />
         ) : (
           <FlatList
-            data={posts}
+            data={posts.sort((a, b) => a.created_at.localeCompare(b.created_at))}
             keyExtractor={(item, index) => String(index)}
-            renderItem={({ item }) => <Post onNavigation={navigation} post={item} userData={user} token={token} />}
+            renderItem={({ item }) => (
+              <Post
+                onNavigation={navigation}
+                post={item}
+                userData={user}
+                token={token}
+                commentTotal={props.commentList}
+              />
+            )}
             showsVerticalScrollIndicator={false}
             ListHeaderComponent={renderHeader(data)}
             onEndReached={() => {
@@ -111,9 +120,17 @@ const styles = StyleSheet.create({
   },
 });
 
-export default React.memo(YourScreen, (state, nextState) => {
-  if (state.posts !== nextState.posts) {
-    return false;
-  }
-  return true;
-});
+const mapStateToProps = (state) => {
+  return {
+    commentList: state.comment.commentList,
+  };
+};
+
+export default connect(mapStateToProps)(
+  React.memo(YourScreen, (state, nextState) => {
+    if (state.posts !== nextState.posts) {
+      return false;
+    }
+    return true;
+  }),
+);

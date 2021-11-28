@@ -79,7 +79,7 @@ function Chat(props) {
         showsVerticalScrollIndicator={false}
         showsHorizontalScrollIndicator={false}
       >
-        {props.user_info.following_list.length > 0 ? (
+        {props.user_info?.following_list.length > 0 ? (
           <ScrollView style={styles.newMatch} horizontal showsHorizontalScrollIndicator={false}>
             {props.user_info?.following_list?.map((item, index) => {
               return (

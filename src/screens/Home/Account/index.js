@@ -83,7 +83,7 @@ function Account({ navigation, ...props }) {
           </View>
           <View style={{ width: '65%', justifyContent: 'center' }}>
             <Text style={{ fontWeight: 'bold', fontSize: 26 }}>
-              {props.user_info?.full_name ? props.user_info.full_name : props.user_info.username}
+              {props.user_info?.full_name ? props.user_info?.full_name : props.user_info?.username}
             </Text>
             <Text style={{ fontSize: 15 }}>{props.user_info?.email}</Text>
           </View>

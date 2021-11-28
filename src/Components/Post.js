@@ -8,7 +8,7 @@ import socketIOClient from 'socket.io-client';
 
 const { width } = Dimensions.get('window');
 
-export default function Post({ post, onNavigation, userData, token }) {
+export default function Post({ post, onNavigation, userData, token, commentTotal }) {
   const [isLiked, setIsLike] = useState(false);
   const [likesCount, setLikesCount] = useState(post.like_count?.length);
   const [commentCount, setCommentCount] = useState(post.comments?.length);
@@ -23,6 +23,12 @@ export default function Post({ post, onNavigation, userData, token }) {
     }
     getToken();
   }, []);
+
+  useEffect(() => {
+    if (post._id === commentTotal.postId) {
+      setCommentCount(commentTotal.commentTotal);
+    }
+  }, [commentTotal.commentTotal]);
 
   const userIsLike = async () => {
     if (post.like_count.find((item) => item.user_id.toString() == userData._id)) {
@@ -149,7 +155,7 @@ export default function Post({ post, onNavigation, userData, token }) {
       <View style={styles.countNumber}>
         {/* <Text style={{ fontSize: 16, color: 'gray' }}>{post?.postAgo}</Text> */}
         <Text style={{ marginLeft: 6, fontSize: 16 }}>{likesCount} người đã thích</Text>
-        <Text style={{ marginLeft: 6, fontSize: 16 }}>{commentCount} người đã bình luận</Text>
+        <Text style={{ marginLeft: 6, fontSize: 16 }}>{commentCount} bình luận</Text>
       </View>
     </View>
   );

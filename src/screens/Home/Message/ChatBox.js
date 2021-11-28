@@ -42,11 +42,11 @@ const ChatBox = ({ navigation, route }) => {
       setLoading(true);
       socket.emit('join', {
         token: token,
-        userIds: [data.user_id],
+        userIds: [data.user_id || data._id],
       });
       socket.emit('send-message', {
         token: token,
-        userId: data.user_id,
+        userId: data.user_id || data._id,
         message: message,
       });
       setMessage('');
@@ -79,7 +79,7 @@ const ChatBox = ({ navigation, route }) => {
           onContentSizeChange={() => scrollView.current.scrollToEnd({ animated: true })}
           keyExtractor={(item) => item?._id}
           renderItem={({ item, key }) => {
-            const isUserSending = item?.user_id === user._id;
+            const isUserSending = item?.user_id || item?._id === user._id;
             return (
               <View key={key} style={{ paddingBottom: 5 }}>
                 <View style={styles.chat}>
